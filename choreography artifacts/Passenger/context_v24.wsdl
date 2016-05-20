@@ -1,0 +1,1084 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.allow-ensembles.com/Context" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="context_v20"
+	targetNamespace="http://www.allow-ensembles.com/Context">
+	<wsdl:types>
+		<xsd:schema
+			xmlns:pref="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+			xmlns:pref1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+			attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://www.allow-ensembles.com/Context">
+			<!-- <xsd:import schemaLocation="Passenger.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"> 
+				</xsd:import> -->
+			<xsd:complexType name="userPreference">
+				<xsd:sequence>
+					<xsd:element name="preferenceID" type="xsd:string" />
+					<xsd:element name="preferenceName" type="xsd:string" />
+					<xsd:element name="preferenceValue" type="xsd:string" />
+					<xsd:element name="preferenceWeight" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="passengerDataType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="name" type="xsd:string" />
+					<xsd:element name="surname" type="xsd:string" />
+					<xsd:element name="city" type="xsd:string" />
+					<xsd:element name="userName" type="xsd:string" />
+					<xsd:element name="passengerType" type="xsd:string" />
+					<xsd:element name="decisionPolicy" type="xsd:string" />
+					<xsd:element name="preferencesList" type="tns:userPreferencesListType"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="userPreferencesListType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="1"
+						name="preferencesList" type="tns:userPreference" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="locationType">
+				<xsd:sequence>
+					<xsd:element name="latitude" type="xsd:double" />
+					<xsd:element name="longitude" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="createPassengerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerData" type="tns:passengerDataType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="createPassengerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<!-- Note: UUID generated in the business logic and persisted in the 
+							DB. This is not the DB key!! The DB key is private to the application -->
+						<xsd:element name="passengerID" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deletePassengerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deletePassengerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="deleted" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- Note: The key attribute of routeID is the composition of the keys 
+				startCluster, endCluster, and routeID -->
+			<xsd:complexType name="routeIDType">
+				<xsd:sequence>
+					<xsd:element name="startCluster" type="xsd:int" />
+					<xsd:element name="endCluster" type="xsd:int" />
+					<xsd:element name="routeID" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="updatePassengerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="name"
+							type="xsd:string" />
+						<xsd:element maxOccurs="1" minOccurs="0" name="surname"
+							type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="city"
+							type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="userName"
+							type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="passengerType"
+							type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="preferences"
+							type="tns:userPreferencesListType"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="decisionPolicy"
+							type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="updatePassengerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="updated" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- Note: Here the discovery of the route alternatives can be either 
+				done using the cluster ID, e.g. going from cluster A to cluster C, or by 
+				matching the location. W.r.t. the departure and arrival time, we currently 
+				don't have that information, since the one provided by the simulation is 
+				too fake -->
+			<xsd:element name="findRouteAlternativesRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="startLocation"
+							type="tns:locationType"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="endLocation"
+							type="tns:locationType"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="startRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="endRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="departureTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="arrivalTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="decisionPolicy"
+							type="xsd:string"></xsd:element>
+						<xsd:element name="preferencesList" type="tns:userPreferencesListType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="findRouteAlternativesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="routesList" type="tns:routeListType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="persistTripAlternativePassengerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="tripAlternative" type="tns:persistTripAlternativeType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="persistTripAlternativePassengerRequestResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="requestTimeStamp" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteTripAlternativePassengerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="requestTimestamp" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteTripAlternativePassengerRequestResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="requestTimestamp" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="addRouteAlternativeRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="route" type="tns:routeType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="addRouteAlternativeResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeID" type="tns:routeIDType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteRouteAlternativeRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeID" type="tns:routeIDType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteRouteAlternativeResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeID" type="tns:routeIDType"></xsd:element>
+						<xsd:element name="removed" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- Note: organization of the route alternatives info. -->
+			<xsd:complexType name="routeType">
+				<xsd:sequence>
+					<xsd:element name="routeID" type="tns:routeIDType"></xsd:element>
+					<xsd:element name="routeTotalCost" type="xsd:double"></xsd:element>
+					<!-- Note: Distance in Meters -->
+					<xsd:element name="routeTotalDistance" type="xsd:double"></xsd:element>
+					<!-- Note: this is just a string and will be empty for the moment. This 
+						is the polyline that Google returns to draw on a Map. Its for demo purposes 
+						in the future. -->
+					<xsd:element maxOccurs="unbounded" minOccurs="0"
+						name="routePolyline" type="tns:polylineType"></xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="0"
+						name="routeTotalNumberofChanges" type="xsd:string"></xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="0"
+						name="routeTotalWalkingDistance" type="xsd:string" />
+					<xsd:element maxOccurs="1" minOccurs="0" name="routeTotalTime"
+						type="xsd:string" />
+					<xsd:element name="routeSteps" type="tns:routeStepsListType"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="routeStepsListType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="1"
+						name="routeStep" type="tns:routeStepType"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="routeStepType">
+				<xsd:sequence>
+					<xsd:element name="startLocation" type="tns:locationType"></xsd:element>
+					<xsd:element name="endLocation" type="tns:locationType"></xsd:element>
+					<!-- Note: Duration in Seconds -->
+					<xsd:element name="stepDuration" type="xsd:double"></xsd:element>
+					<xsd:element name="transportationMode" type="xsd:string"></xsd:element>
+					<!-- Note: Distance in Meters -->
+					<xsd:element name="stepDistance" type="xsd:double"></xsd:element>
+					<xsd:element name="startRegion" type="xsd:int" />
+					<xsd:element name="endRegion" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- Note: the composite key for storing the complete data related to 
+				the trip alternative is the passenger ID and the timestamp when the passenger 
+				performed the request -->
+			<xsd:complexType name="persistTripAlternativeType">
+				<xsd:sequence>
+					<xsd:element name="persitanceID" type="tns:persistTripAlternativeIDType"></xsd:element>
+					<xsd:element name="preferencesList" type="tns:userPreferencesListType"></xsd:element>
+					<xsd:element name="utility" type="xsd:double" />
+					<xsd:element name="startLocation" type="tns:locationType"></xsd:element>
+					<xsd:element name="endLocation" type="tns:locationType"></xsd:element>
+					<!-- Note: Distance in Meters -->
+					<xsd:element name="route" type="tns:routeType" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="routeListType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="1" name="route"
+						type="tns:routeType" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="persistTripAlternativeIDType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="requestTimestamp" type="xsd:string"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="updatePassengerFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="updatePassengerFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deletePassengerFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deletePassengerFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="checkPassengerExists">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:int"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="checkPassengerExistsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="out" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrievePassenger">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrievePassengerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="name" type="xsd:string" />
+						<xsd:element name="surname" type="xsd:string" />
+						<xsd:element name="city" type="xsd:string" />
+						<xsd:element name="userName" type="xsd:string" />
+						<xsd:element name="passengerType" type="xsd:string" />
+						<xsd:element maxOccurs="1" minOccurs="0" name="preferences"
+							type="tns:userPreferencesListType"></xsd:element>
+						<xsd:element name="decisionPolicy" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrievePassengerFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="retrievePassengerFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteRouteAlternativeFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleteRouteAlternativeFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:simpleType name="polylineType">
+				<xsd:restriction base="xsd:string" />
+			</xsd:simpleType>
+			<xsd:element name="persistTripAlternativePassengerRequestFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="persistTripAlternativePassengerRequestFault"
+							type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteTripAlternativePassengerRequestFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleteTripAlternativePassengerRequestFault"
+							type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="addRouteAlternativeFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="addRouteAlternativeFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrieveAllAvailableRoutes">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrieveAllAvailableRoutesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeList" type="tns:routeListType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllPassengers">
+				<xsd:complexType>
+					<xsd:sequence>
+						<!-- Note: this sys admin ID can must be only known to us. Just generate 
+							a random one (e.g. sgomezsaez) so that we don't get any calls from intruders 
+							that delete our data -->
+						<xsd:element name="sysAdminID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllPassengersResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllRoutes">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="in" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllAvailableRoutesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllTripAlternativesPassenger">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="sysAdminID" type="xsd:string"></xsd:element>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllTripAlternativesPassengerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllTripAlternativePassengers">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="in" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllTripAlternativesPassengersResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllAvailableRoutes">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="sysAdminID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteAllTripAlternativesPassengers">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="sysAdminID" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="updateRouteTotalCost">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeID" type="tns:routeIDType"></xsd:element>
+						<xsd:element name="routeCost" type="xsd:double"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="updateRouteTotalCostResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="routeID" type="tns:routeIDType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="updateRouteTotalCostFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="updateRouteTotalCostFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="findCarPoolFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="findCarPoolFault" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrieveRoute">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="RouteId" type="tns:routeIDType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retrieveRouteResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="route" type="tns:routeType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="addCarPool">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="startRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="endRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="departureTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="arrivalTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="FValue"
+							type="xsd:double"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="GValue"
+							type="xsd:double"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="decisionPolicy"
+							type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="addCarPoolResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="PassengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="Route" type="tns:routeType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="findCarPool">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="startRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="endRegion"
+							type="xsd:int"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="departureTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="arrivalTime"
+							type="xsd:time"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="1" name="decisionPolicy"
+							type="xsd:string"></xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0" name="preferencesList"
+							type="tns:userPreferencesListType"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="findCarPoolResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="PassengerID" type="xsd:string"></xsd:element>
+						<xsd:element name="Route" type="tns:routeType"></xsd:element>
+						<xsd:element name="Utility" type="xsd:double"></xsd:element>
+						<xsd:element name="CarPoolID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteCarPoolPassengers">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="sysAdminID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteCarPoolPassengersResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteCarPoolData">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="sysAdminID" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="deleteCarPoolDataResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="deleted" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		
+            <xsd:element name="routeStep" type="tns:routeStepType"></xsd:element>
+        </xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="checkPassengerExistsRequest">
+		<wsdl:part name="parameters" element="tns:checkPassengerExists"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllTripAlternativesPassengerRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllTripAlternativesPassenger"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addRouteAlternativeRequest">
+		<wsdl:part name="parameters" element="tns:addRouteAlternativeRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deletePassengerRequest">
+		<wsdl:part name="parameters" element="tns:deletePassengerRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllTripAlternativesPassengerResponse">
+		<wsdl:part name="parameters"
+			element="tns:deleteAllTripAlternativesPassengerResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllTripAlternativesPassengersResponse">
+		<wsdl:part name="parameters"
+			element="tns:deleteAllTripAlternativesPassengersResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteRouteAlternativeRequest">
+		<wsdl:part name="parameters" element="tns:deleteRouteAlternativeRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="findRouteAlternativesRequest">
+		<wsdl:part name="parameters" element="tns:findRouteAlternativesRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="createPassengerRequest">
+		<wsdl:part name="parameters" element="tns:createPassengerRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteRouteAlternativeResponse">
+		<wsdl:part name="parameters" element="tns:deleteRouteAlternativeResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllTripAlternativePassengersRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllTripAlternativePassengers"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deletePassengerResponse">
+		<wsdl:part name="parameters" element="tns:deletePassengerResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrievePassengerResponse">
+		<wsdl:part name="parameters" element="tns:retrievePassengerResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addCarPoolResponse">
+		<wsdl:part name="parameters" element="tns:addCarPoolResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteTripAlternativePassengerRequestRequest">
+		<wsdl:part name="parameters" element="tns:deleteTripAlternativePassengerRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrieveAllAvailableRoutesRequest">
+		<wsdl:part name="parameters" element="tns:retrieveAllAvailableRoutes"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="persistTripAlternativePassengerRequestFault">
+		<wsdl:part name="parameters"
+			element="tns:persistTripAlternativePassengerRequestFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteRouteAlternativeFault">
+		<wsdl:part name="parameters" element="tns:deleteRouteAlternativeFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllPassengersRequest1">
+		<wsdl:part name="parameters" element="tns:deleteAllPassengers"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteCarPoolPassengersRequest">
+		<wsdl:part name="parameters" element="tns:deleteCarPoolPassengers"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllRoutesRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllRoutes"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="findCarPoolFault">
+		<wsdl:part name="parameters" element="tns:findCarPoolFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updateRouteTotalCostFault">
+		<wsdl:part name="parameters" element="tns:updateRouteTotalCostFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePassengerResponse">
+		<wsdl:part name="parameters" element="tns:updatePassengerResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updateRouteTotalCostRequest">
+		<wsdl:part name="parameters" element="tns:updateRouteTotalCost"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="findRouteAlternativesResponse">
+		<wsdl:part name="parameters" element="tns:findRouteAlternativesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="persistTripAlternativePassengerRequestRequest">
+		<wsdl:part name="parameters" element="tns:persistTripAlternativePassengerRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePassengerRequest">
+		<wsdl:part name="parameters" element="tns:updatePassengerRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrievePassengerFault">
+		<wsdl:part name="parameters" element="tns:retrievePassengerFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllPassengersResponse">
+		<wsdl:part name="parameters" element="tns:deleteAllPassengersResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrieveRouteRequest">
+		<wsdl:part name="parameters" element="tns:retrieveRoute"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addCarPoolRequest">
+		<wsdl:part name="parameters" element="tns:addCarPool"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deletePassengerFault">
+		<wsdl:part name="parameters" element="tns:deletePassengerFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllPassengersRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllPassengers"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteTripAlternativePassengerRequestResponse">
+		<wsdl:part name="parameters"
+			element="tns:deleteTripAlternativePassengerRequestResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllAvailableRoutesResponse">
+		<wsdl:part name="parameters" element="tns:deleteAllAvailableRoutesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updateRouteTotalCostResponse">
+		<wsdl:part name="parameters" element="tns:updateRouteTotalCostResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteTripAlternativePassengerRequestFault">
+		<wsdl:part name="parameters"
+			element="tns:deleteTripAlternativePassengerRequestFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrieveAllAvailableRoutesResponse">
+		<wsdl:part name="parameters" element="tns:retrieveAllAvailableRoutesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllAvailableRoutesRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllAvailableRoutes"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addRouteAlternativeResponse">
+		<wsdl:part name="parameters" element="tns:addRouteAlternativeResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePassengerFault">
+		<wsdl:part name="parameters" element="tns:updatePassengerFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrievePassengerRequest">
+		<wsdl:part name="parameters" element="tns:retrievePassenger"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteCarPoolDataResponse">
+		<wsdl:part name="parameters" element="tns:deleteCarPoolDataResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="findCarPoolResponse">
+		<wsdl:part name="parameters" element="tns:findCarPoolResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteCarPoolDataRequest">
+		<wsdl:part name="parameters" element="tns:deleteCarPoolData"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addRouteAlternativeFault">
+		<wsdl:part name="parameters" element="tns:addRouteAlternativeFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="findCarPoolRequest">
+		<wsdl:part name="parameters" element="tns:findCarPool"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteCarPoolPassengersResponse">
+		<wsdl:part name="parameters" element="tns:deleteCarPoolPassengersResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="checkPassengerExistsResponse">
+		<wsdl:part name="parameters" element="tns:checkPassengerExistsResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="createPassengerResponse">
+		<wsdl:part name="parameters" element="tns:createPassengerResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="retrieveRouteResponse">
+		<wsdl:part name="parameters" element="tns:retrieveRouteResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="persistTripAlternativePassengerRequestResponse">
+		<wsdl:part name="parameters"
+			element="tns:persistTripAlternativePassengerRequestResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteAllTripAlternativesPassengersRequest">
+		<wsdl:part name="parameters" element="tns:deleteAllTripAlternativesPassengers"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="context_v20">
+		<wsdl:operation name="createPassenger">
+			<wsdl:input message="tns:createPassengerRequest"></wsdl:input>
+			<wsdl:output message="tns:createPassengerResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deletePassenger">
+			<wsdl:input message="tns:deletePassengerRequest"></wsdl:input>
+			<wsdl:output message="tns:deletePassengerResponse"></wsdl:output>
+			<wsdl:fault name="deletePassengerFault" message="tns:deletePassengerFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="updatePassenger">
+			<wsdl:input message="tns:updatePassengerRequest"></wsdl:input>
+			<wsdl:output message="tns:updatePassengerResponse"></wsdl:output>
+			<wsdl:fault name="updatePassengerFault" message="tns:updatePassengerFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="findRouteAlternatives">
+			<wsdl:input message="tns:findRouteAlternativesRequest"></wsdl:input>
+			<wsdl:output message="tns:findRouteAlternativesResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="persistTripAlternativePassengerRequest">
+			<wsdl:input message="tns:persistTripAlternativePassengerRequestRequest"></wsdl:input>
+			<wsdl:output message="tns:persistTripAlternativePassengerRequestResponse"></wsdl:output>
+			<wsdl:fault name="persistTripAlternativePassengerRequestFault"
+				message="tns:persistTripAlternativePassengerRequestFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="deleteTripAlternativePassengerRequest">
+			<wsdl:input message="tns:deleteTripAlternativePassengerRequestRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteTripAlternativePassengerRequestResponse"></wsdl:output>
+			<wsdl:fault name="deleteTripAlternativePassengerRequestFault"
+				message="tns:deleteTripAlternativePassengerRequestFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="addRouteAlternative">
+			<wsdl:input message="tns:addRouteAlternativeRequest"></wsdl:input>
+			<wsdl:output message="tns:addRouteAlternativeResponse"></wsdl:output>
+			<wsdl:fault name="addRouteAlternativeFault" message="tns:addRouteAlternativeFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="deleteRouteAlternative">
+			<wsdl:input message="tns:deleteRouteAlternativeRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteRouteAlternativeResponse"></wsdl:output>
+			<wsdl:fault name="deleteRouteAlternativeFault" message="tns:deleteRouteAlternativeFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrievePassenger">
+			<wsdl:input message="tns:retrievePassengerRequest"></wsdl:input>
+			<wsdl:output message="tns:retrievePassengerResponse"></wsdl:output>
+			<wsdl:fault name="retrievePassengerFault" message="tns:retrievePassengerFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveAllAvailableRoutes">
+			<wsdl:input message="tns:retrieveAllAvailableRoutesRequest"></wsdl:input>
+			<wsdl:output message="tns:retrieveAllAvailableRoutesResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllPassengers">
+			<wsdl:input message="tns:deleteAllPassengersRequest1"></wsdl:input>
+			<wsdl:output message="tns:deleteAllPassengersResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllAvailableRoutes">
+			<wsdl:input message="tns:deleteAllAvailableRoutesRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteAllAvailableRoutesResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllTripAlternativesPassenger">
+			<wsdl:input message="tns:deleteAllTripAlternativesPassengerRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteAllTripAlternativesPassengerResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllTripAlternativesPassengers">
+			<wsdl:input message="tns:deleteAllTripAlternativesPassengersRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteAllTripAlternativesPassengersResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateRouteTotalCost">
+			<wsdl:input message="tns:updateRouteTotalCostRequest"></wsdl:input>
+			<wsdl:output message="tns:updateRouteTotalCostResponse"></wsdl:output>
+			<wsdl:fault name="updateRouteTotalCostFault" message="tns:updateRouteTotalCostFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveRoute">
+			<wsdl:input message="tns:retrieveRouteRequest"></wsdl:input>
+			<wsdl:output message="tns:retrieveRouteResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addCarPool">
+			<wsdl:input message="tns:addCarPoolRequest"></wsdl:input>
+			<wsdl:output message="tns:addCarPoolResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="findCarPool">
+			<wsdl:input message="tns:findCarPoolRequest"></wsdl:input>
+			<wsdl:output message="tns:findCarPoolResponse"></wsdl:output>
+			<wsdl:fault name="findCarPoolFault" message="tns:findCarPoolFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="deleteCarPoolPassengers">
+			<wsdl:input message="tns:deleteCarPoolPassengersRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteCarPoolPassengersResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteCarPoolData">
+			<wsdl:input message="tns:deleteCarPoolDataRequest"></wsdl:input>
+			<wsdl:output message="tns:deleteCarPoolDataResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="context_v20SOAP" type="tns:context_v20">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="createPassenger">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/createPassenger" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deletePassenger">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deletePassenger" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="deletePassengerFault">
+				<soap:fault name="deletePassengerFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="updatePassenger">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/updatePassenger" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="updatePassengerFault">
+				<soap:fault name="updatePassengerFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="findRouteAlternatives">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/findRouteAlternatives" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="persistTripAlternativePassengerRequest">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/persistTripAlternativePassengerRequest" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="persistTripAlternativePassengerRequestFault">
+				<soap:fault name="persistTripAlternativePassengerRequestFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="deleteTripAlternativePassengerRequest">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteTripAlternativePassengerRequest" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="deleteTripAlternativePassengerRequestFault">
+				<soap:fault name="deleteTripAlternativePassengerRequestFault"
+					use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="addRouteAlternative">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/addRouteAlternative" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="addRouteAlternativeFault">
+				<soap:fault name="addRouteAlternativeFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="findCarPool">
+			<soap:operation soapAction="http://www.allow-ensembles.com/Context/findCarPool" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="findCarPoolFault">
+				<soap:fault name="findCarPoolFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="deleteRouteAlternative">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteRouteAlternative" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="deleteRouteAlternativeFault">
+				<soap:fault name="deleteRouteAlternativeFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrievePassenger">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/retrievePassenger" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="retrievePassengerFault">
+				<soap:fault name="retrievePassengerFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveAllAvailableRoutes">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/retrieveAllAvailableRoutes" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllPassengers">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteAllPassengers" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllAvailableRoutes">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteAllAvailableRoutes" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllTripAlternativesPassenger">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteAllTripAlternativesPassenger" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteAllTripAlternativesPassengers">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteAllTripAlternativesPassengers" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updateRouteTotalCost">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/updateRouteTotalCost" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="updateRouteTotalCostFault">
+				<soap:fault name="updateRouteTotalCostFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveRoute">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/retrieveRoute" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addCarPool">
+			<soap:operation soapAction="http://www.allow-ensembles.com/Context/addCarPool" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteCarPoolPassengers">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteCarPoolPassengers" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="deleteCarPoolData">
+			<soap:operation
+				soapAction="http://www.allow-ensembles.com/Context/deleteCarPoolData" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="context_v20">
+		<wsdl:port name="context_v20SOAP" binding="tns:context_v20SOAP">
+			<soap:address
+				location="http://services2.tsl.gr:8080/context_v20/services/context_v20/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:UtilityCalculationProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess" xmlns:utility_func="http://www.example.org/utility_func/">
+  <process name="UtilityCalculationProcess:UtilityCalculation">
+    <metaData>
+      <mdProperty name="creationTime" value="1460024050609"/>
+    </metaData>
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-pl">
+      <service name="UtilityCalculationProcess:UtilityCalculation-UtilityCalculationPT-Service" port="UtilityCalculation-UtilityCalculationPT-Port"/>
+    </provide>
+    <invoke partnerLink="utilityPassengerServicePL">
+      <service name="utility_func:utility_func" port="utility_funcSOAP"/>
+    </invoke>
+  </process>
+</deploy>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes"
+    id="daad0ffd-a5c5-43dc-94be-9ac65646964e"
+    name="TransportationMeanDiscovery"
+    targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="TransportationMeanDiscoveryArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery"/>
+    <bpel:partnerLinks>
+        <bpel:partnerLink myRole="TransportationMeanDiscoveryProvider"
+            name="UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-pl" partnerLinkType="ns:UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-plt"/>
+    </bpel:partnerLinks>
+    <bpel:variables>
+        <bpel:variable
+            messageType="ns:discoverTransportationAlternativesRequest" name="discoverTransportationAlternativesRequest-InputVariable"/>
+        <bpel:variable
+            messageType="ns:discoverTransportationAlternativesResponse" name="discoverTransportationAlternativesResponse-OutputVariable"/>
+    </bpel:variables>
+    <bpel:sequence id="11968e61-a9ce-4fb6-a7c8-40fe0cba7570" name="main">
+        <bpel:receive createInstance="yes"
+            id="4ef0d095-0ee8-4774-9b6b-dcc4f8bd291c"
+            name="receiveInput"
+            operation="discoverTransportationAlternatives"
+            partnerLink="UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-pl"
+            portType="ns:TransportationMeanDiscoveryPT" variable="discoverTransportationAlternativesRequest-InputVariable"/>
+        <bpel:assign name="assignOutput" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:discoverTransportationAlternativesResponse
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <ensembleID>ensembleID</ensembleID>
+                            <out>
+                                <name>Bus</name>
+                                <endpointReference>http://services2.tsl.gr:8080/context_v20/services/context_v20/</endpointReference>
+                            </out>
+                        </tns:discoverTransportationAlternativesResponse>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="discoverTransportationAlternativesResponse-OutputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="discoverTransportationAlternativesRequest-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ensembleID]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="discoverTransportationAlternativesResponse-OutputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ensembleID]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:reply id="62acb82f-96da-45b9-9dae-a9add7280072"
+            name="replyOutput"
+            operation="discoverTransportationAlternatives"
+            partnerLink="UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-pl"
+            portType="ns:TransportationMeanDiscoveryPT" variable="discoverTransportationAlternativesResponse-OutputVariable"/>
+    </bpel:sequence>
+</bpel:process>

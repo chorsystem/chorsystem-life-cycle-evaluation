@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" 
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess" 
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	name="UrbanMobilityArtifacts"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+	xmlns:payment="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess"
+	xmlns:paymentTypes="http://iaas.uni-stuttgart.de/allowEnsembles/Payment"
+	xmlns:pssg="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	xmlns:transdisc="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery"
+	xmlns:transmean="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean"
+	xmlns:transp_types="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean/Types"
+	xmlns:ums="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">
+	<plnk:partnerLinkType name="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-plt">
+		<plnk:role name="UrbanMobilityProvider" portType="tns:UrbanMobilityPT" />
+	</plnk:partnerLinkType>
+	
+		<vprop:propertyAlias messageType="tns:tripRequestMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/tns:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:property name="EnsembleIDCSProperty" type="xsd:string" />
+	<vprop:propertyAlias
+		messageType="transdisc:discoverTransportationAlternativesResponse"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="transmean:requestTripResponseMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/transp_types:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:receiveTripRequestResponse"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/tns:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias
+		messageType="transdisc:discoverTransportationAlternativesRequest"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="payment:paymentStatusMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:paymentDetailsMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/tns:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:positiveTripDecisionMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/tns:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:negativeTripDecisionMessage"
+		part="payload" propertyName="tns:EnsembleIDCSProperty">
+		<vprop:query><![CDATA[/tns:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	
+	
+
+	<wsdl:import location="TransportationMeanDiscoveryArtifacts.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery" />
+	<wsdl:import location="TransportationMeanArtifacts.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean" />
+	<wsdl:import location="PaymentArtifacts.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess" />
+	
+	
+	
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+			xmlns:Q1="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+			
+			<xsd:import namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+				schemaLocation="RouteSchema.xsd" />
+
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+				schemaLocation="Passenger.xsd" />
+
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+				schemaLocation="UrbanMobility.xsd" />
+			
+			<xsd:complexType name="tripRequestUMSRequestType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string">
+					</xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="0"
+						name="userFrontendToken" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="startingPoint" type="pssg:locationType" />
+					<xsd:element name="destinationPoint" type="pssg:locationType" />
+
+					<xsd:element maxOccurs="unbounded" minOccurs="0"
+						name="userPreferences" type="pssg:userPreferencesListType">
+					</xsd:element>
+					<xsd:element name="departTime" type="xsd:time" />
+					<xsd:element name="arrivalTime" type="xsd:time" />
+					<xsd:element maxOccurs="unbounded" minOccurs="1"
+						name="transportationMode" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="startClusterRegion" type="xsd:int">
+					</xsd:element>
+					<xsd:element name="endClusterRegion" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="tripRequestUMSResponseType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+					<xsd:element name="tripAlternatives" type="ums:tripAlternativesType">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="receivePassengerPositiveTripRequestType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="userFrontendToken" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+					<xsd:element name="routeID" type="Q1:routeIDType" />
+					<xsd:element name="paymentInfo" type="tns:paymentType" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="exitMessageType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+					<xsd:element default="Good Bye and Good Luck" name="exitMessage"
+						type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="paymentConfirmationType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="userFrontendToken" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+					<xsd:element name="transactionID" type="xsd:string" />
+					<xsd:element name="status" type="xsd:string" />
+					<xsd:element name="routeID" type="Q1:routeIDType" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="receivePassengerNegativeTripRequestType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+
+				</xsd:sequence>
+			</xsd:complexType>
+
+
+			<xsd:element name="receivePassengerPositiveTripRequest"
+				type="tns:receivePassengerPositiveTripRequestType" />
+
+
+			<xsd:element name="exitMessageElement" type="tns:exitMessageType" />
+
+
+			<xsd:element name="tripRequest" type="tns:tripRequestUMSRequestType" />
+
+
+			<xsd:element name="paymentConfirmation" type="tns:paymentConfirmationType" />
+
+
+			<xsd:element name="tripRequestResponse" type="tns:tripRequestUMSResponseType" />
+
+			<xsd:element name="receivePassengerNegativeTripRequest"
+				type="tns:receivePassengerNegativeTripRequestType" />
+
+
+
+			<xsd:element name="tripAlternative" type="ums:tripAlternativeType">
+			</xsd:element>
+
+			<xsd:complexType name="paymentType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="1" minOccurs="1" name="routeID"
+						type="Q1:routeIDType" />
+					<xsd:element maxOccurs="1" minOccurs="1" name="paymentMethod"
+						type="xsd:string">
+					</xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="1"
+						name="paymentMethodName" type="xsd:string">
+					</xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="1"
+						name="paymentMethodNumber" type="xsd:string" />
+					<xsd:element maxOccurs="1" minOccurs="1" name="paymentAmount"
+						type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
+			
+			
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="tripRequestMessage">
+		<wsdl:part element="tns:tripRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="receiveTripRequestResponse">
+		<wsdl:part element="tns:tripRequestResponse" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="positiveTripDecisionMessage">
+		<wsdl:part element="tns:receivePassengerPositiveTripRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="paymentDetailsMessage">
+		<wsdl:part element="tns:paymentConfirmation" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="negativeTripDecisionMessage">
+		<wsdl:part element="tns:receivePassengerNegativeTripRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="UrbanMobilityPT">
+		<wsdl:operation name="receiveTripRequest">
+			<wsdl:input message="tns:tripRequestMessage" />
+			<wsdl:output message="tns:receiveTripRequestResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="receivePositiveTripDecision">
+			<wsdl:input message="tns:positiveTripDecisionMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="receivePaymentConfirmation">
+			<wsdl:input message="tns:paymentDetailsMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="receiveNegativeTripDecision">
+			<wsdl:input message="tns:negativeTripDecisionMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="UrbanMobility-UrbanMobilityPT-Binding" type="tns:UrbanMobilityPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="receiveTripRequest">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess/receiveTripRequest" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receivePositiveTripDecision">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess/receivePositiveTripDecision" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="receivePaymentConfirmation">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess/receivePaymentConfirmation" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="receiveNegativeTripDecision">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess/receiveNegativeTripDecision" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="UrbanMobility-UrbanMobilityPT-Service">
+		<wsdl:port binding="tns:UrbanMobility-UrbanMobilityPT-Binding" name="UrbanMobility-UrbanMobilityPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/UrbanMobility-UrbanMobilityPT-Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

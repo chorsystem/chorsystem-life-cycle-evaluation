@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="UtilityCalculationArtifacts"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+	xmlns:pref="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	xmlns:pref1="http://www.example.org/utility_func/">
+	<plnk:partnerLinkType name="Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-plt">
+		<plnk:role name="UtilityCalculationProvider" portType="tns:UtilityCalculationPT" />
+	</plnk:partnerLinkType>
+	<plnk:partnerLinkType name="utilityPassengerServicePLT">
+		<plnk:role name="utilityPassenger" portType="pref1:utility_func" />
+	</plnk:partnerLinkType>
+	<wsdl:import location="utility_func.wsdl" namespace="http://www.example.org/utility_func/" />
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+			xmlns:pref2="http://iaas.uni-stuttgart.de/allowEnsembles/GoogleMapsDirs"
+			xmlns:pref3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">
+			
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+				schemaLocation="Passenger.xsd">
+			</xsd:import>
+			<xsd:import namespace="http://www.example.org/utility_func/types"
+				schemaLocation="Utility.xsd">
+			</xsd:import>
+			<xsd:import namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+				schemaLocation="RouteSchema.xsd">
+			</xsd:import>
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+				schemaLocation="UrbanMobility.xsd" />
+			
+		
+			<xsd:element name="UtilityCalculation-UtilityCalculationPT-Request">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string" />
+						<xsd:element name="ensembleID" type="xsd:string" />
+						<xsd:element name="startLocation"
+							type="pref:locationType">
+						</xsd:element>
+						<xsd:element name="endLocation"
+							type="pref:locationType">
+						</xsd:element>
+						<xsd:element maxOccurs="1" minOccurs="0"
+							name="departTime" type="xsd:time" />
+						<xsd:element maxOccurs="1" minOccurs="0"
+							name="arrivalTime" type="xsd:time" />
+						<xsd:element name="tripAlternatives"
+							type="pref3:tripAlternativesType">
+						</xsd:element>
+						<xsd:element name="userPreferences"
+							type="pref:userPreferencesListType">
+						</xsd:element>
+						<xsd:element maxOccurs="unbounded" minOccurs="0"
+							name="transportationMode" type="xsd:string" />
+						<xsd:element name="startCluster" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+						<xsd:element name="endCluster" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="UtilityCalculation-UtilityCalculationPT-Response">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:string" />
+						<xsd:element name="ensembleID" type="xsd:string" />
+						<xsd:element name="tripAlternatives" type="pref3:tripAlternativesType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="utilityFBMCalculation">
+				<xsd:complexType>
+					<xsd:sequence>
+
+						<xsd:element name="id" type="xsd:int" />
+						<xsd:element name="passengerID" type="xsd:string" />
+						<xsd:element name="ensembleID" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="utilityFBMCalculationResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+
+						<xsd:element name="id" type="xsd:int" />
+						<xsd:element name="passengerID" type="xsd:string" />
+						<xsd:element name="ensembleID" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+	
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="UtilityCalculationRequestMessage">
+		<wsdl:part element="tns:UtilityCalculation-UtilityCalculationPT-Request" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="UtilityCalculationResponseMessage">
+		<wsdl:part element="tns:UtilityCalculation-UtilityCalculationPT-Response" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="UtilityCalculationPT">
+		<wsdl:operation name="utilityPassengerCalculation">
+			<wsdl:input message="tns:UtilityCalculationRequestMessage" />
+			<wsdl:output message="tns:UtilityCalculationResponseMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="UtilityCalculation-UtilityCalculationPT-Binding" type="tns:UtilityCalculationPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="utilityPassengerCalculation">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess/utilityPassengerCalculation" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="UtilityCalculation-UtilityCalculationPT-Service">
+		<wsdl:port binding="tns:UtilityCalculation-UtilityCalculationPT-Binding" name="UtilityCalculation-UtilityCalculationPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/UtilityCalculation-UtilityCalculationPT-Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="PaymentService"
+	targetNamespace="http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://siserver.org/schema"
+	xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<wsdl:types>
+		<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="http://siserver.org/schema"
+				schemaLocation="PaymentService.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="receivePaymentRequestRequest">
+		<wsdl:part name="receivePaymentRequest" element="ns:receivePaymentRequestPayload">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="replyToPaymentRequestRequest">
+		<wsdl:part name="replyToPaymentRequest" element="ns:replyToPaymentRequestPayload">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="PaymentServicePortType">
+		<wsdl:operation name="receivePayment">
+			<wsdl:input message="tns:receivePaymentRequestRequest">
+			</wsdl:input>
+			<wsdl:output message="tns:replyToPaymentRequestRequest">
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="PaymentServiceSOAPBinding" type="tns:PaymentServicePortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="receivePayment">
+			<soap:operation
+				soapAction="http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/receivePayment" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="PaymentService">
+		<wsdl:port name="PaymentServicePort" binding="tns:PaymentServiceSOAPBinding">
+			<soap:address location="http://129.69.214.128:8080/webServices-0.0.1-SNAPSHOT/services/PaymentService/" />
+		</wsdl:port>
+	</wsdl:service>
+	
+	<plnk:partnerLinkType name="PaymentParticipant-PaymentService">
+		<plnk:role name="paymentServiceRole" portType="tns:PaymentServicePortType"/>
+		<plnk:role name="participantRole" portType="tns:PaymentServicePortType"/>
+	</plnk:partnerLinkType>
+</wsdl:definitions>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+	xmlns:pref="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	elementFormDefault="qualified">
+
+
+	<!-- Note: The key attribute of routeID is the composition of the keys startCluster, 
+		endCluster, and routeID -->
+	
+	<complexType name="routeIDType">
+		<sequence>
+			<element name="startCluster" type="int"></element>
+			<element name="endCluster" type="int"></element>
+			<element name="routeID" type="string"></element>
+		</sequence>
+	</complexType>
+
+	<!-- Note: organization of the route alternatives info. -->
+	<!-- <complexType name="routeType">
+		<sequence>
+			<element name="routeID" type="tns:routeIDType"></element>
+			<element name="routeTotalCost" type="double"></element>
+			Note: Distance in Meters
+			<element name="routeTotalDistance" type="double"></element>
+			Note: this is just a string and will be empty for the moment. This 
+				is the polyline that Google returns to draw on a Map. Its for demo purposes 
+				in the future.
+			<element name="routeTotalTime" type="string"></element>
+			<element name="routePolyline" type="tns:polylineType"
+				maxOccurs="unbounded" minOccurs="0">
+			</element>
+			<element name="routeTotalNumberofChanges" type="string"
+				maxOccurs="1" minOccurs="0">
+			</element>
+			<element name="routeTotalWalkingDistance" type="string"
+				maxOccurs="1" minOccurs="0">
+			</element>
+			<element name="routeSteps" type="tns:routeStepsListType">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="routeStepsListType">
+		<sequence>
+			<element name="routeStep" type="tns:routeStepType" maxOccurs="unbounded"
+				minOccurs="1">
+			</element>
+		</sequence>
+	</complexType>
+
+	<simpleType name="polylineType">
+		<restriction base="string"></restriction>
+	</simpleType>
+
+	<complexType name="routeStepType">
+		<sequence>
+			<element name="startLocation" type="pref:locationType">
+			</element>
+			<element name="endLocation" type="pref:locationType">
+			</element>
+			Note: Duration in Seconds
+			<element name="stepDuration" type="double"></element>
+			<element name="transportationMode" type="string"></element>
+			Note: Distance in Meters
+			<element name="stepDistance" type="double"></element>
+			<element name="startRegion" type="int"></element>
+			<element name="endRegion" type="int"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="routeListType">
+		<sequence>
+			<element name="route" type="tns:routeType"></element>
+		</sequence>
+	</complexType>
+ -->
+</schema>

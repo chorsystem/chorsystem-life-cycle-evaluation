@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bplog:Log xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bplog="http://simtech.de/bpel/logging" processModelName="Payment" processModelPath="C:\Users\weissas\workspaces\deployment_evaluation\TripBooking\new_cgrounding\Payment\Payment.bpel">
+  <modelChange xsi:type="bplog:ValueChange" changeReason="AttributeChanged" timestamp="2016-04-16T15:18:25.533+0200">
+    <containingElement elementType="receive" elementName="receivePaymentRequest" elementXPath="/process/sequence[1]/receive[1]"/>
+    <attribute attributeName="createInstance" oldValue="" newValue="yes"/>
+  </modelChange>
+</bplog:Log>

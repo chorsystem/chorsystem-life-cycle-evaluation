@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:Context="http://www.allow-ensembles.com/Context" xmlns:TransportationMean="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean">
+  <process name="TransportationMean:TransportationMean">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="UrbanMobility-TransportationMean-realizedBy-TransportationMeanPT-pl">
+      <service name="TransportationMean:TransportationMean-TransportationMeanPT-Service" port="TransportationMean-TransportationMeanPT-Port"/>
+    </provide>
+    <invoke partnerLink="TransportationMean-TransportationServicePL">
+      <service name="Context:context_v20" port="context_v20SOAP"/>
+    </invoke>
+  </process>
+</deploy>

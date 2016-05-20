@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean/Types"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean/Types"
+	xmlns:pass="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	xmlns:ums="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+	elementFormDefault="qualified">
+
+	<!-- <import namespace="http://iaas.uni-stuttgart.de/allowEnsembles/GoogleMapsDirs"
+		schemaLocation="GoogleMapsDirs.xsd" />
+ -->
+	<import
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+		schemaLocation="Passenger.xsd" />
+
+	<import
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+		schemaLocation="UrbanMobility.xsd" />
+
+	<complexType name="TransportationMeansListType">
+		<sequence>
+			<element name="partnerLink" type="string" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<element name="TransportationMeansPLs" type="tns:TransportationMeansListType" />
+
+	<element name="requestTripMessageType" type="tns:tRequestType" />
+	<complexType name="tRequestType">
+		<sequence>
+			<element name="passengerID" type="string" />
+			<element name="ensembleID" type="string"></element>
+			<element name="start_loc" type="pass:locationType">
+			</element>
+			<element name="end_loc" type="pass:locationType"></element>
+			<element name="userPreferences"
+				type="pass:userPreferencesListType">
+			</element>
+			<element name="transportationMeanEndpointRef"
+				type="tns:transportationMeanEndpointRefType">
+			</element>
+			<element name="departTime" type="time"></element>
+			<element name="arrivalTime" type="time"></element>
+			<element name="startClusterRegion" type="string"></element>
+			<element name="endClusterRegion" type="string"></element>
+		</sequence>
+	</complexType>
+	<element name="requestTripResponseMessageType" type="tns:tResponseType" />
+	<complexType name="tResponseType">
+		<sequence>
+			<element name="passengerID" type="string" />
+			<element name="ensembleID" type="string"></element>
+			<element name="tripAlternatives" type="ums:tripAlternativesType"></element>
+		</sequence>
+	</complexType>
+
+	<element name="routeInformationRequestCounterElement" type="tns:routeInformationRequestCounterType" />
+	<complexType name="routeInformationRequestCounterType">
+		<sequence>
+			<element name="number" type="unsignedInt" />
+		</sequence>
+	</complexType>
+
+	<complexType name="transportationMeanEndpointRefType">
+		<sequence>
+			<element name="endpoint" type="string"></element>
+			<element name="name" type="string"></element>
+		</sequence>
+	</complexType>
+
+
+
+</schema>

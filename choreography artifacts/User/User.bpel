@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes"
+    id="81e9689b-e567-4925-9bea-0f4cca54b854" name="User"
+    targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+    xmlns:ns0="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess"
+    xmlns:ns1="receiveTransactionStatus"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <bpel:import importType="http://www.w3.org/2001/XMLSchema"
+        location="UrbanMobility.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"/>
+    <bpel:import importType="http://www.w3.org/2001/XMLSchema"
+        location="RouteSchema.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"/>
+    <bpel:import importType="http://www.w3.org/2001/XMLSchema"
+        location="Passenger.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="UserArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="PassengerArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"/>
+    <bpel:partnerLinks>
+        <bpel:partnerLink
+            name="User-Passenger-realizedBy-PassengerPT-pl"
+            partnerLinkType="ns:User-Passenger-realizedBy-PassengerPT-plt" partnerRole="PassengerProvider"/>
+        <bpel:partnerLink myRole="UserProvider"
+            name="UrbanMobility-User-realizedBy-UserPT-pl" partnerLinkType="ns0:UrbanMobility-User-realizedBy-UserPT-plt"/>
+        <bpel:partnerLink myRole="UserProvider"
+            name="client-User-realizedBy-client-UserPortType-pl" partnerLinkType="ns0:client-User-realizedBy-client-UserPortType-plt"/>
+    </bpel:partnerLinks>
+    <bpel:variables>
+        <bpel:variable messageType="ns:passengerTripRequestMessage" name="passengerTripRequestMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns:passengerTripRequestResponseMessage" name="passengerTripRequestResponseMessage-OutputVariable"/>
+        <bpel:variable messageType="ns:receiveTripAlternativesMessage" name="receiveTripAlternativesMessage-InputVariable"/>
+        <bpel:variable messageType="ns:requestPaymentRequest" name="requestPaymentRequest-InputVariable"/>
+        <bpel:variable messageType="ns0:sendTicketRequestMessage" name="sendTicketRequestMessage-InputVariable"/>
+        <bpel:variable messageType="ns:paymentStatusMessage" name="paymentStatusMessage-InputVariable"/>
+        <bpel:variable messageType="ns0:client-UserRequestMessage" name="client-UserRequestMessage-InputVariable"/>
+        <bpel:variable messageType="ns0:client-UserResponseMessage" name="client-UserResponseMessage-OutputVariable"/>
+    </bpel:variables>
+    <bpel:correlationSets>
+        <bpel:correlationSet name="UserCorrelationSet" properties="ns0:passengerID"/>
+    </bpel:correlationSets>
+    <bpel:sequence id="74d7552e-7e7c-4cdb-a5e2-0d3550d0d208" name="main">
+        <bpel:receive createInstance="yes"
+            id="d452d94a-0a97-446e-8dda-18f91c266da3"
+            name="receiveFromEnvironment" operation="process"
+            partnerLink="client-User-realizedBy-client-UserPortType-pl"
+            portType="ns0:client-UserPortType" variable="client-UserRequestMessage-InputVariable"/>
+        <bpel:assign name="AssignParameters" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:passengerTripRequest
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns1:userFrontendToken>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns1:userFrontendToken>
+                            <tns1:userPreferences>
+                                <tns1:preferencesList>
+                                    <tns1:preferenceID>TravelTime</tns1:preferenceID>
+                                    <tns1:preferenceValue>3.24</tns1:preferenceValue>
+                                    <tns1:preferenceWeight>0.204545454545455</tns1:preferenceWeight>
+                                </tns1:preferencesList>
+                                <tns1:preferencesList>
+                                    <tns1:preferenceID>Cost</tns1:preferenceID>
+                                    <tns1:preferenceValue>2.09</tns1:preferenceValue>
+                                    <tns1:preferenceWeight>0.303030303030303</tns1:preferenceWeight>
+                                </tns1:preferencesList>
+                                <tns1:preferencesList>
+                                    <tns1:preferenceID>WalkingDistance</tns1:preferenceID>
+                                    <tns1:preferenceValue>7.18</tns1:preferenceValue>
+                                    <tns1:preferenceWeight>0.333333333333333</tns1:preferenceWeight>
+                                </tns1:preferencesList>
+                                <tns1:preferencesList>
+                                    <tns1:preferenceID>NoOfChanges</tns1:preferenceID>
+                                    <tns1:preferenceValue>2</tns1:preferenceValue>
+                                    <tns1:preferenceWeight>0.159090909090909</tns1:preferenceWeight>
+                                </tns1:preferencesList>
+                            </tns1:userPreferences>
+                            <tns1:passengerID>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns1:passengerID>
+                            <tns1:name>Liah</tns1:name>
+                            <tns1:start_loc>
+                                <tns1:latitude>46.08</tns1:latitude>
+                                <tns1:longitude>11.10</tns1:longitude>
+                            </tns1:start_loc>
+                            <tns1:end_loc>
+                                <tns1:latitude>46.08</tns1:latitude>
+                                <tns1:longitude>11.11</tns1:longitude>
+                            </tns1:end_loc>
+                            <tns1:startClusterRegion>1</tns1:startClusterRegion>
+                            <tns1:endClusterRegion>2</tns1:endClusterRegion>
+                            <tns1:departTime>07:45:00</tns1:departTime>
+                            <tns1:arrivalTime>0:00:00</tns1:arrivalTime>
+                            <tns1:transportationModes>Bus</tns1:transportationModes>
+                            <tns1:policyType>price</tns1:policyType>
+                        </tns:passengerTripRequest>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="passengerTripRequestMessage-InputVariable"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:invoke id="4b8fdb2d-8dc2-47ad-9763-acc6b6f2606f"
+            inputVariable="passengerTripRequestMessage-InputVariable"
+            name="callRequestTripFunctionality"
+            operation="passengerTripRequest"
+            outputVariable="passengerTripRequestResponseMessage-OutputVariable"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl" portType="ns:PassengerPT">
+            <bpel:correlations>
+                <bpel:correlation initiate="yes" pattern="response" set="UserCorrelationSet"/>
+                <bpel:correlation initiate="no" pattern="request" set="UserCorrelationSet"/>
+            </bpel:correlations>
+        </bpel:invoke>
+        <bpel:assign name="Assign" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:passengerTripAlternative
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:passengerID>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns:passengerID>
+                            <tns:existTripAlternative>true</tns:existTripAlternative>
+                            <tns:requestTimeStamp>7:41:00</tns:requestTimeStamp>
+                            <wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing"/>
+                            <tns:tripAlternative>
+                                <tns1:routeID>06145afd-fb28-4d4244-8c898a-c2a5401fe763</tns1:routeID>
+                                <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>1</tns2:startCluster>
+                                    <tns2:endCluster>2</tns2:endCluster>
+                                    <tns2:routeID>06145afd-fb28-4d4244-8c898a-c2a5401fe763</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.171428571428572</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>11506.0</tns2:routeTotalDistance>
+                                    <tns2:routeTotalTime>2095</tns2:routeTotalTime>
+                                    <tns2:routePolyline>ax+b</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>3</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>1307</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.080499</tns3:latitude>
+                                    <tns3:longitude>11.098333</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.080499</tns3:latitude>
+                                    <tns3:longitude>11.098333</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>660.0</tns2:stepDuration>
+                                    <tns2:transportationMode>WALKING</tns2:transportationMode>
+                                    <tns2:stepDistance>1010.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.083258</tns3:latitude>
+                                    <tns3:longitude>11.063955</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.083258</tns3:latitude>
+                                    <tns3:longitude>11.063955</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>360.0</tns2:stepDuration>
+                                    <tns2:transportationMode>TRANSIT</tns2:transportationMode>
+                                    <tns2:stepDistance>3436.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.083094</tns3:latitude>
+                                    <tns3:longitude>11.063877</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.083094</tns3:latitude>
+                                    <tns3:longitude>11.063877</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>19.0</tns2:stepDuration>
+                                    <tns2:transportationMode>WALKING</tns2:transportationMode>
+                                    <tns2:stepDistance>19.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.071816</tns3:latitude>
+                                    <tns3:longitude>11.121974</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.071816</tns3:latitude>
+                                    <tns3:longitude>11.121974</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>660.0</tns2:stepDuration>
+                                    <tns2:transportationMode>TRANSIT</tns2:transportationMode>
+                                    <tns2:stepDistance>5769.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.071711</tns3:latitude>
+                                    <tns3:longitude>11.121389</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.071711</tns3:latitude>
+                                    <tns3:longitude>11.121389</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>46.0</tns2:stepDuration>
+                                    <tns2:transportationMode>WALKING</tns2:transportationMode>
+                                    <tns2:stepDistance>46.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.076988</tns3:latitude>
+                                    <tns3:longitude>11.118892</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.076988</tns3:latitude>
+                                    <tns3:longitude>11.118892</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>180.0</tns2:stepDuration>
+                                    <tns2:transportationMode>TRANSIT</tns2:transportationMode>
+                                    <tns2:stepDistance>994.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>46.0753524</tns3:latitude>
+                                    <tns3:longitude>11.1191036</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>46.0753524</tns3:latitude>
+                                    <tns3:longitude>11.1191036</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>170.0</tns2:stepDuration>
+                                    <tns2:transportationMode>WALKING</tns2:transportationMode>
+                                    <tns2:stepDistance>232.0</tns2:stepDistance>
+                                    <tns2:startRegion>1</tns2:startRegion>
+                                    <tns2:endRegion>2</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                </tns1:route>
+                                <tns1:utility>0.6481757324919544</tns1:utility>
+                            </tns:tripAlternative>
+                        </tns:passengerTripAlternative>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="receiveTripAlternativesMessage-InputVariable"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="AssignEPR" validate="no">
+            <bpel:copy>
+                <bpel:from endpointReference="myRole" partnerLink="UrbanMobility-User-realizedBy-UserPT-pl"/>
+                <bpel:to part="payload" variable="receiveTripAlternativesMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[wsa:EndpointReference]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:invoke id="fa290fad-f438-49df-bc8e-58b782106b27"
+            inputVariable="receiveTripAlternativesMessage-InputVariable"
+            name="sendTripAlternative"
+            operation="receiveTripAlternatives"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl" portType="ns:PassengerPT"/>
+        <bpel:wait name="Wait">
+            <bpel:for><![CDATA['PT10S']]></bpel:for>
+        </bpel:wait>
+        <bpel:assign name="Assign1" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:requestPayment
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:passengerID>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns:passengerID>
+                            <tns:ensembleID>123</tns:ensembleID>
+                            <tns:userFrontendTokenID>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns:userFrontendTokenID>
+                            <tns:paymentData>
+                                <tns:routeID>
+                                    <tns2:startCluster>1</tns2:startCluster>
+                                    <tns2:endCluster>2</tns2:endCluster>
+                                    <tns2:routeID>06145afd-fb28-4d4244-8c898a-c2a5401fe763</tns2:routeID>
+                                </tns:routeID>
+                                <tns:paymentMethod>Visa</tns:paymentMethod>
+                                <tns:paymentMethodName>Andreas</tns:paymentMethodName>
+                                <tns:paymentMethodNumber>3333333</tns:paymentMethodNumber>
+                                <tns:paymentAmount>15</tns:paymentAmount>
+                            </tns:paymentData>
+                        </tns:requestPayment>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="requestPaymentRequest-InputVariable"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:invoke id="983fa39a-53d7-48a6-a439-cc47947cd3de"
+            inputVariable="requestPaymentRequest-InputVariable"
+            name="sendPaymentDetails" operation="requestPayment"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl" portType="ns1:PassengerPT"/>
+        <bpel:receive id="9baf7ac1-db10-4c2c-804b-3f5dbcb5bdf2"
+            name="receiveTicket" operation="receiveTicket"
+            partnerLink="UrbanMobility-User-realizedBy-UserPT-pl"
+            portType="ns0:UserPT" variable="sendTicketRequestMessage-InputVariable">
+            <bpel:correlations>
+                <bpel:correlation initiate="no" set="UserCorrelationSet"/>
+            </bpel:correlations>
+        </bpel:receive>
+        <bpel:assign name="Assign2" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:User-client-UserPortType-Response
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:input>tns:input</tns:input>
+                        </tns:User-client-UserPortType-Response>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="client-UserResponseMessage-OutputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:receivePaymentStatusElement
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:ensembleID>123</tns:ensembleID>
+                            <tns:passengerID>e3ae87c0-3947-474c4f-848c86-29c084e71bd6</tns:passengerID>
+                            <tns:status>ok</tns:status>
+                            <tns:transactionID>3333</tns:transactionID>
+                        </tns:receivePaymentStatusElement>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="paymentStatusMessage-InputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="client-UserRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns0:input]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="client-UserResponseMessage-OutputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns0:input]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:invoke id="dc4d52f3-a354-4202-8bb7-39f00560b36c"
+            inputVariable="paymentStatusMessage-InputVariable"
+            name="callPaymentStatusFunctionality"
+            operation="receiveTransactionStatus"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl" portType="ns:PassengerPT"/>
+        <bpel:reply id="403307f9-c618-4994-ab72-f3695277e6c9"
+            name="replyToEnvironment" operation="process"
+            partnerLink="client-User-realizedBy-client-UserPortType-pl"
+            portType="ns0:client-UserPortType" variable="client-UserResponseMessage-OutputVariable"/>
+    </bpel:sequence>
+</bpel:process>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ASCII"?>
+<cb:ChoreographyBundle xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:cb="http://org.eclipse.bpel4chor.deployment" name="TripBooking" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking" choreographyModelID="bbb50ea0-ce1b-4e09-8cb6-86e44a079824">
+  <processBundleFolders>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\UtilityCalculation" name="UtilityCalculation" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess" processModelID="6a7114c9-9bbd-44de-9343-7338811c7cbc" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/UtilityCalculation/UtilityCalculationArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\User" name="User" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" processModelID="81e9689b-e567-4925-9bea-0f4cca54b854" endpoint="http://Alguille:9081/ode/processes/">
+      <startActivities href="User/User.bpel#//@activity/@activities.0"/>
+      <processWSDL href="/TripBooking/new_cgrounding/User/UserArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\TransportationMean" name="TransportationMean" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean" processModelID="3143c356-171e-49bb-a4c3-9c462b96c0ad" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/TransportationMean/TransportationMeanArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\TransportationMeanDiscovery" name="TransportationMeanDiscovery" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery" processModelID="daad0ffd-a5c5-43dc-94be-9ac65646964e" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/TransportationMeanDiscovery/TransportationMeanDiscoveryArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\Payment" name="Payment" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess" processModelID="77995494-ef95-4b37-a602-25bf65ab27b3" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/Payment/PaymentArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\Passenger" name="Passenger" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess" processModelID="0c8c6445-93e7-40ba-9a30-8e3395055602" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/Passenger/PassengerArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\PolicyTripAlternativeProcessor" name="PolicyTripAlternativeProcessor" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative" processModelID="f7ed45e4-bf57-4d7d-b86a-39a44818491f" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/PolicyTripAlternativeProcessor/PolicyTripAlternativeProcessorArtifacts.wsdl#/"/>
+    </processBundleFolder>
+    <processBundleFolder filePath="\TripBooking\new_cgrounding\UrbanMobility" name="UrbanMobility" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess" processModelID="98453a45-4c85-46ad-8e90-4ddfafe6adcb" endpoint="http://Alguille:9081/ode/processes/">
+      <processWSDL href="/TripBooking/new_cgrounding/UrbanMobility/UrbanMobilityArtifacts.wsdl#/"/>
+    </processBundleFolder>
+  </processBundleFolders>
+  <services serviceName="{http://www.allow-ensembles.com/Context}context_v20" portType="{http://www.allow-ensembles.com/Context}context_v20" port="{http://www.allow-ensembles.com/Context}context_v20SOAP" endpoint="http://Alguille:9084/services/context/context_v20"/>
+  <services serviceName="{http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/}PaymentService" portType="{http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/}PaymentServicePortType" port="{http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/}PaymentServicePort" endpoint="http://Alguille:9084/webServices-0.0.1-SNAPSHOT/services/PaymentService"/>
+  <services serviceName="{http://www.example.org/utility_func/}utility_func" portType="{http://www.example.org/utility_func/}utility_func" port="{http://www.example.org/utility_func/}utility_funcSOAP" endpoint="http://Alguille:9084/services/UtilityCalculation/UtilityCalculationService"/>
+</cb:ChoreographyBundle>

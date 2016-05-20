@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" 
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess" 
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	name="PassengerArtifacts"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+	xmlns:trip_alt="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+	xmlns:ums="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+	xmlns:utility="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+	xmlns:ctx="http://www.allow-ensembles.com/Context"
+	xmlns:ent="http://iaas.uni-stuttgart.de/allowEnsembles/EntityManagement"
+	xmlns:pssg="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	xmlns:ump="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+	xmlns:route="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	>
+	<plnk:partnerLinkType name="User-Passenger-realizedBy-PassengerPT-plt">
+		<plnk:role name="PassengerProvider" portType="tns:PassengerPT" />
+	</plnk:partnerLinkType>
+
+	<vprop:property name="EnsembleIDCS" type="xsd:string" />
+
+	<vprop:property name="PassengerCSProperty" type="xsd:string" />
+	<vprop:propertyAlias messageType="tns:passengerTripRequestMessage"
+		part="payload" propertyName="tns:PassengerCSProperty">
+		<vprop:query><![CDATA[/pssg:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+
+	<vprop:propertyAlias messageType="tns:receiveTripAlternativesMessage"
+		part="payload" propertyName="tns:PassengerCSProperty">
+		<vprop:query><![CDATA[/tns:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:paymentStatusMessage"
+		part="payload" propertyName="tns:PassengerCSProperty">
+		<vprop:query><![CDATA[/tns:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="tns:passengerTripRequestResponseMessage"
+		part="payload" propertyName="tns:PassengerCSProperty">
+		<vprop:query><![CDATA[/tns:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="ump:positiveTripDecisionMessage"
+		part="payload" propertyName="tns:EnsembleIDCS">
+		<vprop:query><![CDATA[/ump:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+	<vprop:propertyAlias messageType="ump:paymentDetailsMessage"
+		part="payload" propertyName="tns:EnsembleIDCS">
+		<vprop:query><![CDATA[/ump:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+
+	<vprop:propertyAlias messageType="ump:receiveTripRequestResponse"
+		part="payload" propertyName="tns:EnsembleIDCS">
+		<vprop:query><![CDATA[/ump:ensembleID]]></vprop:query>
+	</vprop:propertyAlias>
+
+	
+	<vprop:propertyAlias messageType="tns:requestPaymentRequest"
+		part="payload" propertyName="tns:PassengerCSProperty">
+		<vprop:query><![CDATA[/tns:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+	
+	
+	<wsdl:import location="UrbanMobilityArtifacts.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess" />
+	<wsdl:import location="UtilityCalculationArtifacts.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess" />
+
+	
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess">
+			
+			<xsd:import namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+				schemaLocation="RouteSchema.xsd" />
+
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+				schemaLocation="Passenger.xsd" />
+
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+				schemaLocation="UrbanMobility.xsd" />
+			 
+			 <xsd:import schemaLocation="ws-addr.xsd" namespace="http://www.w3.org/2005/08/addressing"></xsd:import>	
+			
+			<xsd:complexType name="passengerTripResponseType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="ensembleID" type="xsd:string" />
+					
+					<xsd:element name="tripAlternatives" type="ums:tripAlternativesType" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="passengerTripAlternativeType">
+				<xsd:sequence>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="existTripAlternative" type="xsd:boolean" />
+					<xsd:element name="requestTimeStamp" type="xsd:time" />
+					<xsd:element ref="wsa:EndpointReference"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="tripAlternative"
+						type="ums:tripAlternativeType" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="ticketInformationType">
+				<xsd:sequence>
+					<xsd:element name="customerID" type="xsd:string" />
+					<xsd:element name="PassengerName" type="xsd:string" />
+					<xsd:element name="startingPoint" type="xsd:string" />
+					<xsd:element name="destinationPoint" type="xsd:string" />
+					<xsd:element name="Cost" type="xsd:int" />
+					<xsd:element name="Confirmed" type="xsd:boolean" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="paymentStatusType">
+				<xsd:sequence>
+					<xsd:element name="ensembleID" type="xsd:string"></xsd:element>
+					<xsd:element name="passengerID" type="xsd:string" />
+					<xsd:element name="status" type="xsd:string" />
+					<xsd:element name="transactionID" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="passengerTripRequest" type="pssg:passengerTripRequestType" />
+			<xsd:element name="passengerTripResponse" type="tns:passengerTripResponseType" />
+			<xsd:element name="ticketInformationElement" type="tns:ticketInformationType" />
+			<xsd:element name="passengerTripAlternative" type="tns:passengerTripAlternativeType" />
+			<xsd:element name="receivePaymentStatusElement" type="tns:paymentStatusType" />
+
+			<xsd:element name="tripAlternative" type="ums:tripAlternativeType"></xsd:element>
+			
+			<xsd:element name="requestPayment">
+				<xsd:complexType>
+					<xsd:sequence>
+
+						<xsd:element name="passengerID" type="xsd:string" />
+						<xsd:element name="ensembleID" type="xsd:string" />
+						<xsd:element name="userFrontendTokenID" type="xsd:string">
+						</xsd:element>
+						<xsd:element name="paymentData" type="tns:paymentDataType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:complexType name="paymentDataType">
+				<xsd:sequence>
+					<xsd:element name="routeID" type="route:routeIDType" />
+					<xsd:element name="paymentMethod" type="xsd:string" />
+					<xsd:element name="paymentMethodName" type="xsd:string" />
+					<xsd:element name="paymentMethodNumber" type="xsd:string" />
+					<xsd:element name="paymentAmount" type="xsd:double"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="passengerTripRequestMessage">
+		<wsdl:part element="tns:passengerTripRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="passengerTripRequestResponseMessage">
+		<wsdl:part element="tns:passengerTripResponse" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="receiveTripAlternativesMessage">
+		<wsdl:part element="tns:passengerTripAlternative" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="requestPaymentRequest">
+		<wsdl:part element="tns:requestPayment" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="paymentStatusMessage">
+		<wsdl:part element="tns:receivePaymentStatusElement" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="PassengerPT">
+		<wsdl:operation name="passengerTripRequest">
+			<wsdl:input message="tns:passengerTripRequestMessage" />
+			<wsdl:output message="tns:passengerTripRequestResponseMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="receiveTripAlternatives">
+			<wsdl:input message="tns:receiveTripAlternativesMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="receiveTransactionStatus">
+			<wsdl:input message="tns:paymentStatusMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="requestPayment">
+			<wsdl:input message="tns:requestPaymentRequest" />
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="Passenger-PassengerPT-Binding" type="tns:PassengerPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="passengerTripRequest">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess/passengerTripRequest" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="receiveTripAlternatives">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess/receiveTripAlternatives" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="requestPayment">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess/requestPayment" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="receiveTransactionStatus">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess/receiveTransactionStatus" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		
+	</wsdl:binding>
+	<wsdl:service name="Passenger-PassengerPT-Service">
+		<wsdl:port binding="tns:Passenger-PassengerPT-Binding" name="Passenger-PassengerPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/Passenger-PassengerPT-Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

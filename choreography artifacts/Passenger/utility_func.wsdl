@@ -1,0 +1,142 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.example.org/utility_func/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	name="utility_func" targetNamespace="http://www.example.org/utility_func/">
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified"
+			elementFormDefault="qualified" targetNamespace="http://www.example.org/utility_func/">
+			<xsd:element name="rank">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="in" type="tns:Trip" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rankResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="out" type="tns:Trip" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="InvalidInputFault">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="id" type="xsd:int" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:complexType name="Trip">
+				<xsd:sequence>
+					<xsd:element maxOccurs="1" minOccurs="1" name="request"
+						type="tns:Request" />
+					<xsd:element maxOccurs="1" minOccurs="1" name="alternatives"
+						type="tns:AlternativeListType" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="Request">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string" />
+					<xsd:element name="RequestTimestamp" type="xsd:string" />
+					<xsd:element name="StartPoint" type="tns:Coordinate" />
+					<xsd:element name="EndPoint" type="tns:Coordinate" />
+					<xsd:element name="StartCluster" type="xsd:int" />
+					<xsd:element name="EndCluster" type="xsd:int" />
+					<xsd:element maxOccurs="unbounded" minOccurs="1" name="Modes"
+						type="tns:ModesList"></xsd:element>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DepartTime"
+						type="xsd:time" />
+					<xsd:element maxOccurs="1" minOccurs="0" name="ArrivalTime"
+						type="xsd:time" />
+					<xsd:element maxOccurs="unbounded" minOccurs="1"
+						name="preference" type="tns:PreferenceListType" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="Alternative">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string" />
+					<xsd:element name="StartCluster" type="xsd:int" />
+					<xsd:element name="EndCluster" type="xsd:int" />
+					<xsd:element name="NoOfChanges" type="xsd:int" />
+					<xsd:element name="WalkingDistance" type="xsd:int" />
+					<xsd:element name="TravelTime" type="xsd:int" />
+					<xsd:element name="Cost" type="xsd:double" />
+					<xsd:element name="Utility" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="Coordinate">
+				<xsd:sequence>
+					<xsd:element name="PointX" type="xsd:double" />
+					<xsd:element name="PointY" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="Preference">
+				<xsd:sequence>
+					<xsd:element name="Name" type="xsd:string" />
+					<xsd:element name="Value" type="xsd:double" />
+					<xsd:element name="Weight" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="AlternativeListType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="1"
+						name="alternative" type="tns:Alternative" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="PreferenceListType">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0"
+						name="Preference" type="tns:Preference" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ModesList">
+				<xsd:sequence>
+					<xsd:element maxOccurs="1" minOccurs="0" name="mode"
+						type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="PreferenceList" type="tns:PreferenceListType"></xsd:element>
+			<xsd:element name="AlternativeList" type="tns:AlternativeListType"></xsd:element>
+			<xsd:element name="Preference" type="tns:Preference"></xsd:element>
+			<xsd:element name="alternative" type="tns:Alternative"></xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="rankRequest">
+		<wsdl:part name="parameters" element="tns:rank"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="InvalidInputFaultMessage">
+		<wsdl:part name="fault" element="tns:InvalidInputFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="rankResponse">
+		<wsdl:part name="parameters" element="tns:rankResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="utility_func">
+		<wsdl:operation name="rank">
+			<wsdl:input message="tns:rankRequest"></wsdl:input>
+			<wsdl:output message="tns:rankResponse"></wsdl:output>
+			<wsdl:fault name="InvalidInputException" message="tns:InvalidInputFaultMessage"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="utility_funcSOAP" type="tns:utility_func">
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="rank">
+			<wsdlsoap:operation soapAction="http://www.example.org/utility_func/rank" />
+			<wsdl:input>
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="InvalidInputException">
+				<wsdlsoap:fault name="InvalidInputException" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="utility_func">
+		<wsdl:port name="utility_funcSOAP" binding="tns:utility_funcSOAP">
+			<wsdlsoap:address
+				location="http://services2.tsl.gr:8080/utility_func/services/utility_func/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

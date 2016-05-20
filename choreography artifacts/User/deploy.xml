@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:PassengerProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess" xmlns:UserProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">
+  <process name="UserProcess:User">
+    <metaData>
+      <mdProperty name="creationTime" value="1460390186566"/>
+    </metaData>
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="client-User-realizedBy-client-UserPortType-pl">
+      <service name="UserProcess:User-client-UserPortType-Service" port="User-client-UserPortType-Port"/>
+    </provide>
+    <provide partnerLink="UrbanMobility-User-realizedBy-UserPT-pl">
+      <service name="UserProcess:User-UserPT-Service" port="User-UserPT-Port"/>
+    </provide>
+    <invoke partnerLink="User-Passenger-realizedBy-PassengerPT-pl">
+      <service name="PassengerProcess:Passenger-PassengerPT-Service" port="Passenger-PassengerPT-Port"/>
+      <binding name="PassengerProcess:Passenger-PassengerPT-Binding"/>
+    </invoke>
+  </process>
+</deploy>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:TransportationMeanDiscovery="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery">
+  <process name="TransportationMeanDiscovery:TransportationMeanDiscovery">
+    <metaData>
+      <mdProperty name="creationTime" value="1460024050609"/>
+    </metaData>
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-pl">
+      <service name="TransportationMeanDiscovery:TransportationMeanDiscovery-TransportationMeanDiscoveryPT-Service" port="TransportationMeanDiscovery-TransportationMeanDiscoveryPT-Port"/>
+    </provide>
+  </process>
+</deploy>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" name="UserArtifacts" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">
+	<plnk:partnerLinkType name="UrbanMobility-User-realizedBy-UserPT-plt">
+		<plnk:role name="UserProvider" portType="tns:UserPT"/>
+	</plnk:partnerLinkType>
+	<plnk:partnerLinkType name="client-User-realizedBy-client-UserPortType-plt">
+		<plnk:role name="UserProvider" portType="tns:client-UserPortType"/>
+	</plnk:partnerLinkType>
+	<vprop:property name="passengerID" type="xsd:string"/>
+	<vprop:propertyAlias messageType="wsdl1:passengerTripRequestMessage" part="payload" propertyName="tns:passengerID">
+		<vprop:query><![CDATA[/xsd1:passengerID]]></vprop:query>
+	</vprop:propertyAlias>
+    <vprop:propertyAlias messageType="tns:sendTicketRequestMessage" part="payload" propertyName="tns:passengerID">
+    <vprop:query><![CDATA[/tns:passengerID]]></vprop:query>
+  </vprop:propertyAlias>
+    <vprop:propertyAlias messageType="wsdl1:passengerTripRequestResponseMessage" part="payload" propertyName="tns:passengerID">
+    <vprop:query><![CDATA[/wsdl1:passengerID]]></vprop:query>
+  </vprop:propertyAlias>
+    <wsdl:import location="PassengerArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"/>
+    <wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">
+
+			<xsd:complexType name="tRequestType">
+				<xsd:sequence>
+					<xsd:element name="input" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="User-client-UserPortType-Request" type="tns:tClientRequestType"/>
+			<xsd:complexType name="tClientRequestType">
+				<xsd:sequence>
+					<xsd:element name="input" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="User-client-UserPortType-Response" type="tns:tClientResponseType"/>
+			<xsd:complexType name="tClientResponseType">
+				<xsd:sequence>
+					<xsd:element name="input" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="SendTicketInformation">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="passengerID" type="xsd:int"/>
+						<xsd:element name="userFrontendToken" type="xsd:string"/>
+						<xsd:element name="trip_id" type="xsd:int"/>
+						<xsd:element name="payment_transaction_id" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="sendTicketRequestMessage">
+		<wsdl:part element="tns:SendTicketInformation" name="payload"/>
+	</wsdl:message>
+	<wsdl:message name="client-UserRequestMessage">
+		<wsdl:part element="tns:User-client-UserPortType-Request" name="payload"/>
+	</wsdl:message>
+	<wsdl:message name="client-UserResponseMessage">
+		<wsdl:part element="tns:User-client-UserPortType-Response" name="payload"/>
+	</wsdl:message>
+	<wsdl:portType name="UserPT">
+		<wsdl:operation name="receiveTicket">
+			<wsdl:input message="tns:sendTicketRequestMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:portType name="client-UserPortType">
+		<wsdl:operation name="process">
+			<wsdl:input message="tns:client-UserRequestMessage"/>
+			<wsdl:output message="tns:client-UserResponseMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="User-UserPT-Binding" type="tns:UserPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="receiveTicket">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess/receiveTicket"/>
+			<wsdl:input>
+				<soap:body use="Literal"/>
+			</wsdl:input>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="User-client-UserPortType-Binding" type="tns:client-UserPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="process">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess/process"/>
+			<wsdl:input>
+				<soap:body use="Literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="Literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="User-UserPT-Service">
+		<wsdl:port binding="tns:User-UserPT-Binding" name="User-UserPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/User-UserPT-Service"/>
+		</wsdl:port>
+	</wsdl:service>
+	<wsdl:service name="User-client-UserPortType-Service">
+		<wsdl:port binding="tns:User-client-UserPortType-Binding" name="User-client-UserPortType-Port">
+			<soap:address location="http://localhost:8080/ode/processes/User-client-UserPortType-Service"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bplog:Log xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bplog="http://simtech.de/bpel/logging" processModelName="UtilityCalculation" processModelPath="C:\Users\weissas\workspaces\deployment_evaluation\TripBooking\new_cgrounding\UtilityCalculation\UtilityCalculation.bpel">
+  <modelChange xsi:type="bplog:ValueChange" changeReason="AttributeChanged" timestamp="2016-04-16T13:23:07.627+0200">
+    <containingElement elementType="pick" elementName="Pick" elementXPath="/process/sequence[1]/pick[1]"/>
+    <attribute attributeName="createInstance" oldValue="" newValue="yes"/>
+  </modelChange>
+</bplog:Log>

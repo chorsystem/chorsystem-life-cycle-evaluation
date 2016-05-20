@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+	elementFormDefault="qualified" xmlns:pref="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+	xmlns:ums="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">
+
+	<import schemaLocation="UrbanMobility.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"></import>
+	<complexType name="passengerTripRequestType">
+		<sequence>
+			<element name="userFrontendToken" type="string"></element>
+			<element name="userPreferences"
+				type="tns:userPreferencesListType" maxOccurs="1" minOccurs="0">
+			</element>
+			<element name="passengerID" type="string" />
+			<element name="name" type="string" />
+			<element name="start_loc" type="tns:locationType" />
+			<element name="end_loc" type="tns:locationType" />
+			<element name="startClusterRegion" type="int" maxOccurs="1"
+				minOccurs="0">
+			</element>
+			<element name="endClusterRegion" type="int" maxOccurs="1"
+				minOccurs="0">
+			</element>
+			<element name="departTime" type="time" maxOccurs="1"
+				minOccurs="0">
+			</element>
+			<element name="arrivalTime" type="time" maxOccurs="1"
+				minOccurs="0">
+			</element>
+			<element name="transportationModes" type="string"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+			<element name="policyType" type="string" maxOccurs="1" minOccurs="0"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="userPreference">
+		<sequence>
+			<element name="preferenceID" type="string"></element>
+			<element name="preferenceValue" type="string"></element>
+			<element name="preferenceWeight" type="double" />
+		</sequence>
+	</complexType>
+
+	<complexType name="userPreferencesListType">
+		<sequence>
+			<element maxOccurs="unbounded" minOccurs="0"
+				name="preferencesList" type="tns:userPreference" />
+		</sequence>
+	</complexType>
+
+	<complexType name="locationType">
+		<sequence>
+			<element name="latitude" type="double" />
+			<element name="longitude" type="double" />
+		</sequence>
+	</complexType>
+
+
+
+
+
+</schema>

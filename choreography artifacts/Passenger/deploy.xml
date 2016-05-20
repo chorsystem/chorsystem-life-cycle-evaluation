@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:PassengerProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess" xmlns:UrbanMobilityProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess" xmlns:UserProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" xmlns:UtilityCalculationProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess" xmlns:tripAlternative="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative">
+  <process name="PassengerProcess:Passenger">
+    <metaData>
+      <mdProperty name="creationTime" value="1460390186566"/>
+    </metaData>
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="User-Passenger-realizedBy-PassengerPT-pl">
+      <service name="PassengerProcess:Passenger-PassengerPT-Service" port="Passenger-PassengerPT-Port"/>
+    </provide>
+    <invoke partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl">
+      <service name="UrbanMobilityProcess:UrbanMobility-UrbanMobilityPT-Service" port="UrbanMobility-UrbanMobilityPT-Port"/>
+      <binding name="UrbanMobilityProcess:UrbanMobility-UrbanMobilityPT-Binding"/>
+    </invoke>
+    <invoke partnerLink="Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-pl">
+      <service name="UtilityCalculationProcess:UtilityCalculation-UtilityCalculationPT-Service" port="UtilityCalculation-UtilityCalculationPT-Port"/>
+      <binding name="UtilityCalculationProcess:UtilityCalculation-UtilityCalculationPT-Binding"/>
+    </invoke>
+    <invoke partnerLink="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl">
+      <service name="tripAlternative:PolicyTripAlternativeProcessor-PolicyProcessorPT-Service" port="PolicyTripAlternativeProcessor-PolicyProcessorPT-Port"/>
+      <binding name="UserProcess:User-client-UserPortType-Binding"/>
+    </invoke>
+  </process>
+</deploy>

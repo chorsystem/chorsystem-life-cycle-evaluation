@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://iaas.uni-stuttgart.de/allowEnsembles/Payment"
+	attributeFormDefault="unqualified" elementFormDefault="unqualified"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/Payment" xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+
+	<xs:import schemaLocation="RouteSchema.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route"></xs:import>
+	<xs:complexType name="receivePaymentRequestType">
+		<xs:sequence>
+			<xs:element name="passengerID" type="xs:string"></xs:element>
+			<xs:element name="ensembleID" type="xs:string"></xs:element>
+			<xs:element name="userFrontendToken" type="xs:string"></xs:element>
+
+
+			<xs:element name="paymentData" type="ns:paymentDataType"></xs:element>
+
+        </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="replyPaymentRequestType">
+		<xs:sequence>
+			<xs:element name="passengerID" type="xs:string" />
+			<xs:element name="ensembleID" type="xs:string"></xs:element>
+			<xs:element name="paymentData" type="ns:paymentDataType"></xs:element>
+			<xs:element name="transactionID" type="xs:string"></xs:element>
+			<xs:element name="status" type="xs:string"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="receivePaymentRequestPayload"
+		type="ns:receivePaymentRequestType">
+	</xs:element>
+	<xs:element name="replyToPaymentRequestPayload"
+		type="ns:replyPaymentRequestType">
+	</xs:element>
+
+	<xs:complexType name="paymentDataType">
+		<xs:sequence>
+			<xs:element name="routeID" type="tns:routeIDType"></xs:element>
+			<xs:element name="fareID" type="xs:string"></xs:element>
+			<xs:element name="paymentMethodName" type="xs:string"></xs:element>
+			<xs:element name="paymentMethod" type="xs:string"></xs:element>
+			<xs:element name="paymentMethodNumber" type="xs:string"></xs:element>
+			<xs:element name="paymentAmount" type="xs:double"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

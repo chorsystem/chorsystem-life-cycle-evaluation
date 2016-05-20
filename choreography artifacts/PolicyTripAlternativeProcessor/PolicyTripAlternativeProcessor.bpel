@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes"
+    id="f7ed45e4-bf57-4d7d-b86a-39a44818491f"
+    name="PolicyTripAlternativeProcessor"
+    targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+    xmlns:ns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+    xmlns:ns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="PolicyTripAlternativeProcessorArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"/>
+    <bpel:import importType="http://www.w3.org/2001/XMLSchema"
+        location="UrbanMobility.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"/>
+    <bpel:partnerLinks>
+        <bpel:partnerLink
+            myRole="PolicyTripAlternativeProcessorProvider"
+            name="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl" partnerLinkType="ns:Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-plt"/>
+    </bpel:partnerLinks>
+    <bpel:variables>
+        <bpel:variable
+            messageType="ns:policyTripAlternativeProcessorRequestMessage" name="policyTripAlternativeProcessorRequestMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns:policyTripAlternativeProcessorResponseMessage" name="policyTripAlternativeProcessorResponseMessage-OutputVariable"/>
+        <bpel:variable name="valueToCompare" type="xsd:double">
+            <bpel:from>
+                <bpel:literal>0.0</bpel:literal>
+            </bpel:from>
+        </bpel:variable>
+        <bpel:variable name="totalDuration" type="xsd:double">
+            <bpel:from>
+                <bpel:literal>0.0</bpel:literal>
+            </bpel:from>
+        </bpel:variable>
+        <bpel:variable name="value" type="xsd:double">
+            <bpel:from>
+                <bpel:literal>0.0</bpel:literal>
+            </bpel:from>
+        </bpel:variable>
+        <bpel:variable name="addToResponse" type="xsd:boolean"/>
+        <bpel:variable element="ns:tripAlternative" name="tripAlternative"/>
+    </bpel:variables>
+    <bpel:sequence id="44065917-3937-4ef2-94b0-4536a2d65f7b" name="main">
+        <bpel:receive createInstance="yes"
+            id="81cafd90-b89c-496d-8d8a-e68e591e43b2"
+            name="receiveInput" operation="process"
+            partnerLink="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl"
+            portType="ns:PolicyProcessorPT" variable="policyTripAlternativeProcessorRequestMessage-InputVariable"/>
+        <bpel:assign name="AssignOutput" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+
+                        <tns:PolicyTripAlternativeProcessor-PolicyProcessorPT-Response
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:policyType>tns:policyType</tns:policyType>
+                            <tns:tripAlternative>
+                                <tns1:routeID>tns1:routeID</tns1:routeID>
+                                <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routeTotalTime>tns2:routeTotalTime</tns2:routeTotalTime>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                </tns1:route>
+                                <tns1:utility>0.0</tns1:utility>
+                            </tns:tripAlternative>
+                        </tns:PolicyTripAlternativeProcessor-PolicyProcessorPT-Response>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="policyTripAlternativeProcessorRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:policyType]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:policyType]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from><![CDATA[false()]]></bpel:from>
+                <bpel:to variable="addToResponse"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>0.0</bpel:literal>
+                </bpel:from>
+                <bpel:to variable="value"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>0.0</bpel:literal>
+                </bpel:from>
+                <bpel:to variable="valueToCompare"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>0.0</bpel:literal>
+                </bpel:from>
+                <bpel:to variable="totalDuration"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:tripAlternative
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns1:routeID xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">tns1:routeID</tns1:routeID>
+                            <tns1:route xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">
+                                <tns2:routeID xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                </tns2:routeID>
+                                <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges</tns2:routeTotalNumberofChanges>
+                                <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance</tns2:routeTotalWalkingDistance>
+                                <tns2:routeSteps xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+                                    <tns2:routeStep xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                </tns2:routeSteps>
+                            </tns1:route>
+                            <tns1:utility xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">0.0</tns1:utility>
+                        </tns:tripAlternative>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to variable="tripAlternative"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:forEach counterName="Counter"
+            name="ForEachTripAlternative" parallel="no">
+            <bpel:startCounterValue><![CDATA[1]]></bpel:startCounterValue>
+            <bpel:finalCounterValue><![CDATA[count($policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative)]]></bpel:finalCounterValue>
+            <bpel:scope>
+                <bpel:sequence>
+                    <bpel:if name="If">
+                        <bpel:condition><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:policyType = "utility" or $policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:policyType = "cost" or $policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:policyType = "duration"]]></bpel:condition>
+                        <bpel:sequence name="utility">
+                            <bpel:assign name="Assign" validate="no">
+                                <bpel:copy>
+                                    <bpel:from><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:utility ]]></bpel:from>
+                                    <bpel:to variable="valueToCompare"/>
+                                </bpel:copy>
+                            </bpel:assign>
+                            <bpel:if name="If2">
+                                <bpel:condition><![CDATA[$valueToCompare > $value or $Counter = 1]]></bpel:condition>
+                                <bpel:sequence name="compareUtilityValue">
+                                    <bpel:assign
+                                    name="assignAddToResponse" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from><![CDATA[true()]]></bpel:from>
+                                    <bpel:to variable="addToResponse"/>
+                                    </bpel:copy>
+                                    <bpel:copy>
+                                    <bpel:from variable="valueToCompare"/>
+                                    <bpel:to variable="value"/>
+                                    </bpel:copy>
+                                    </bpel:assign>
+                                </bpel:sequence>
+                            </bpel:if>
+                        </bpel:sequence>
+                        <bpel:elseif>
+                            <bpel:condition><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:policyType = "duration" ]]></bpel:condition>
+                            <bpel:sequence name="duration">
+                                <bpel:assign name="assignTotalDuration" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from><![CDATA[number($policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:route/ns3:routeTotalTime)]]></bpel:from>
+                                    <bpel:to variable="valueToCompare"/>
+                                    </bpel:copy>
+                                </bpel:assign>
+                                <bpel:if name="If3">
+                                    <bpel:condition><![CDATA[$valueToCompare < $value or $Counter = 1]]></bpel:condition>
+                                    <bpel:sequence name="compareTotalTripDuration">
+                                    <bpel:assign
+                                    name="assignAddToResponse" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from><![CDATA[true()]]></bpel:from>
+                                    <bpel:to variable="addToResponse"/>
+                                    </bpel:copy>
+                                    <bpel:copy>
+                                    <bpel:from variable="valueToCompare"/>
+                                    <bpel:to variable="value"/>
+                                    </bpel:copy>
+                                    </bpel:assign>
+                                    </bpel:sequence>
+                                </bpel:if>
+                            </bpel:sequence>
+                        </bpel:elseif>
+                        <bpel:elseif>
+                            <bpel:condition><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:policyType = "price"]]></bpel:condition>
+                            <bpel:sequence name="price">
+                                <bpel:assign name="assignTotalPrice" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:route/ns3:routeTotalCost ]]></bpel:from>
+                                    <bpel:to variable="valueToCompare"/>
+                                    </bpel:copy>
+                                </bpel:assign>
+                                <bpel:if name="If4">
+                                    <bpel:condition><![CDATA[$valueToCompare < $value or $Counter = 1]]></bpel:condition>
+                                    <bpel:sequence name="compareTotalPrice">
+                                    <bpel:assign
+                                    name="assignAddToResponse" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from><![CDATA[true()]]></bpel:from>
+                                    <bpel:to variable="addToResponse"/>
+                                    </bpel:copy>
+                                    <bpel:copy>
+                                    <bpel:from variable="valueToCompare"/>
+                                    <bpel:to variable="value"/>
+                                    </bpel:copy>
+                                    </bpel:assign>
+                                    </bpel:sequence>
+                                </bpel:if>
+                            </bpel:sequence>
+                        </bpel:elseif>
+                        <bpel:else>
+                            <bpel:sequence name="none">
+                                <bpel:assign name="assignNullVals" validate="no">
+                                    <bpel:copy>
+                                    <bpel:from>
+                                    <bpel:literal>0.0</bpel:literal>
+                                    </bpel:from>
+                                    <bpel:to variable="valueToCompare"/>
+                                    </bpel:copy>
+                                    <bpel:copy>
+                                    <bpel:from>
+                                    <bpel:literal>0.0</bpel:literal>
+                                    </bpel:from>
+                                    <bpel:to variable="value"/>
+                                    </bpel:copy>
+                                </bpel:assign>
+                            </bpel:sequence>
+                        </bpel:else>
+                    </bpel:if>
+                    <bpel:if name="If1">
+                        <bpel:condition><![CDATA[$addToResponse = true()]]></bpel:condition>
+                        <bpel:sequence name="Sequence">
+                            <bpel:assign name="assignNewValues" validate="no">
+                                <bpel:copy keepSrcElementName="yes">
+                                    <bpel:from><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:routeID]]></bpel:from>
+                                    <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:routeID]]></bpel:query>
+                                    </bpel:to>
+                                </bpel:copy>
+                                <bpel:copy>
+                                    <bpel:from><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:utility]]></bpel:from>
+                                    <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:utility]]></bpel:query>
+                                    </bpel:to>
+                                </bpel:copy>
+                                <bpel:copy>
+                                    <bpel:from><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns:tripAlternatives/ns1:tripAlternative[position()=$Counter]/ns1:route]]></bpel:from>
+                                    <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:route]]></bpel:query>
+                                    </bpel:to>
+                                </bpel:copy>
+                                <bpel:copy>
+                                    <bpel:from><![CDATA[false()]]></bpel:from>
+                                    <bpel:to variable="addToResponse"/>
+                                </bpel:copy>
+                            </bpel:assign>
+                        </bpel:sequence>
+                    </bpel:if>
+                </bpel:sequence>
+            </bpel:scope>
+        </bpel:forEach>
+        <bpel:assign name="assignOutput" validate="no">
+            <bpel:copy>
+                <bpel:from variable="tripAlternative"/>
+                <bpel:to part="payload" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:tripAlternative]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:reply id="ee78316f-92ac-4554-82a9-efcb9570b0fb"
+            name="replyOutput" operation="process"
+            partnerLink="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl"
+            portType="ns:PolicyProcessorPT" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable"/>
+    </bpel:sequence>
+</bpel:process>

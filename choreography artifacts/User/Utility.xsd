@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/utility_func/types"
+	xmlns:tns="http://www.example.org/utility_func/types" elementFormDefault="qualified">
+
+	<complexType name="Trip">
+		<sequence>
+			<element name="request" type="tns:Request" maxOccurs="1"
+				minOccurs="1"></element>
+			<element name="alternatives" type="tns:Alternative"
+				maxOccurs="unbounded" minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="Request">
+		<sequence>
+			<element name="id" type="int"></element>
+			<element name="StartPoint" type="tns:Coordinate"></element>
+			<element name="EndPoint" type="tns:Coordinate"></element>
+			<element name="Modes" type="string" maxOccurs="unbounded"
+				minOccurs="1">
+			</element>
+			<element name="DepartTime" type="time"></element>
+			<element name="ArrivalTime" type="time"></element>
+
+			<element name="preference" type="tns:Preference" maxOccurs="unbounded"
+				minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="Alternative">
+		<sequence>
+			<element name="id" type="int"></element>
+			<element name="NoOfChanges" type="int"></element>
+			<element name="WalkingDistance" type="int"></element>
+			<element name="TravelTime" type="int"></element>
+			<element name="Cost" type="double"></element>
+			<element name="Utility" type="double"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="Coordinate">
+		<sequence>
+			<element name="PointX" type="double"></element>
+			<element name="PointY" type="double"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="Preference">
+		<sequence>
+			<element name="Name" type="string"></element>
+			<element name="Value" type="double"></element>
+			<element name="Weight" type="double"></element>
+		</sequence>
+	</complexType>
+</schema>

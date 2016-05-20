@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PolicyTripAlternativeProcessorArtifacts"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative">
+	<plnk:partnerLinkType name="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-plt">
+		<plnk:role name="PolicyTripAlternativeProcessorProvider" portType="tns:PolicyProcessorPT" />
+	</plnk:partnerLinkType>
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative" xmlns:pref="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+			xmlns:pref1="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:pref2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+			xmlns:pref3="http://www.example.org/utility_func/types">
+
+			<xsd:import schemaLocation="Passenger.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger">
+			</xsd:import>
+			<xsd:import schemaLocation="RouteSchema.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Route">
+			</xsd:import>
+			<xsd:import schemaLocation="UrbanMobility.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility">
+			</xsd:import>
+			<xsd:import schemaLocation="Utility.xsd" namespace="http://www.example.org/utility_func/types"></xsd:import>
+
+			<xsd:element name="PolicyTripAlternativeProcessor-PolicyProcessorPT-Request" type="tns:polictyTripAlternativeProcessorRequestType" />
+
+			<xsd:element name="PolicyTripAlternativeProcessor-PolicyProcessorPT-Response" type="tns:policyTripAlternativeProcessorResponseType" />
+
+			<xsd:complexType name="polictyTripAlternativeProcessorRequestType">
+				<xsd:sequence>
+					<xsd:element name="policyType" type="xsd:string"></xsd:element>
+					<xsd:element name="tripAlternatives" type="pref2:tripAlternativesType"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="policyTripAlternativeProcessorResponseType">
+				<xsd:sequence>
+					<xsd:element name="policyType" type="xsd:string"></xsd:element>
+					<xsd:element name="tripAlternative" type="pref2:tripAlternativeType"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="tripAlternative" type="pref2:tripAlternativeType">
+			</xsd:element>
+
+
+
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="policyTripAlternativeProcessorRequestMessage">
+		<wsdl:part element="tns:PolicyTripAlternativeProcessor-PolicyProcessorPT-Request" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="policyTripAlternativeProcessorResponseMessage">
+		<wsdl:part element="tns:PolicyTripAlternativeProcessor-PolicyProcessorPT-Response" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="PolicyProcessorPT">
+		<wsdl:operation name="process">
+			<wsdl:input message="tns:policyTripAlternativeProcessorRequestMessage" />
+			<wsdl:output message="tns:policyTripAlternativeProcessorResponseMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="PolicyTripAlternativeProcessor-PolicyProcessorPT-Binding" type="tns:PolicyProcessorPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="process">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative/process" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="PolicyTripAlternativeProcessor-PolicyProcessorPT-Service">
+		<wsdl:port binding="tns:PolicyTripAlternativeProcessor-PolicyProcessorPT-Binding" name="PolicyTripAlternativeProcessor-PolicyProcessorPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/PolicyTripAlternativeProcessor-PolicyProcessorPT-Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

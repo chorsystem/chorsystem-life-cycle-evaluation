@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PaymentArtifacts"
+	targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess"
+	xmlns:wsdl1="http://www.iaas.uni-stuttgart.de/allowEnsembles/payment-service/"
+	xmlns:payment="http://iaas.uni-stuttgart.de/allowEnsembles/Payment">
+	<plnk:partnerLinkType name="UrbanMobility-Payment-realizedBy-PaymentPT-plt">
+		<plnk:role name="PaymentProvider" portType="tns:PaymentPT" />
+	</plnk:partnerLinkType>
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+			targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess">
+			<xsd:import
+				namespace="http://iaas.uni-stuttgart.de/allowEnsembles/Payment"
+				schemaLocation="Payment.xsd" />
+			
+			<xsd:element name="Payment-PaymentPT-Request" type="payment:receivePaymentRequestType" />
+			
+			<xsd:element name="Payment-PaymentPT-Response" type="payment:replyPaymentRequestType" />
+			
+			
+			
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="requestPaymentMessage">
+		<wsdl:part element="tns:Payment-PaymentPT-Request" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="paymentStatusMessage">
+		<wsdl:part element="tns:Payment-PaymentPT-Response" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="PaymentPT">
+		<wsdl:operation name="payment">
+			<wsdl:input message="tns:requestPaymentMessage" />
+			<wsdl:output message="tns:paymentStatusMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="Payment-PaymentPT-Binding" type="tns:PaymentPT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="payment">
+			<soap:operation soapAction="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess/payment" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="Payment-PaymentPT-Service">
+		<wsdl:port binding="tns:Payment-PaymentPT-Binding" name="Payment-PaymentPT-Port">
+			<soap:address location="http://localhost:8080/ode/processes/Payment-PaymentPT-Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

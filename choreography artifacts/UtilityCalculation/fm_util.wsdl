@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://services.tsl.gr/fm_util/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="fm_util"
+	targetNamespace="http://services.tsl.gr/fm_util/">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://services.tsl.gr/fm_util/">
+			<xsd:element name="rank">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="in" type="tns:Route" maxOccurs="unbounded"
+							minOccurs="1" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rankResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="out" type="tns:Route" maxOccurs="unbounded"
+							minOccurs="1" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:complexType name="Route">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:int"></xsd:element>
+					<xsd:element name="day" type="xsd:date"></xsd:element>
+					<xsd:element name="pick-up" type="xsd:string"
+						maxOccurs="unbounded" minOccurs="1">
+					</xsd:element>
+					<xsd:element name="prTime" type="xsd:time" maxOccurs="unbounded"
+						minOccurs="1">
+					</xsd:element>
+					<xsd:element name="Cost" type="xsd:double"></xsd:element>
+					<xsd:element name="Capacity" type="xsd:int"></xsd:element>
+					<xsd:element name="prf" type="tns:Preference"
+						maxOccurs="unbounded" minOccurs="1">
+					</xsd:element>
+					<xsd:element name="State" type="xsd:int"></xsd:element>
+					<xsd:element name="Utility" type="xsd:double"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="Preference">
+				<xsd:sequence>
+					<xsd:element name="value" type="xsd:boolean" maxOccurs="unbounded"
+						minOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="rankRequest">
+		<wsdl:part element="tns:rank" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="rankResponse">
+		<wsdl:part element="tns:rankResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:portType name="fm_util">
+		<wsdl:operation name="rank">
+			<wsdl:input message="tns:rankRequest" />
+			<wsdl:output message="tns:rankResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="fm_utilSOAP" type="tns:fm_util">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="rank">
+			<soap:operation soapAction="http://services.tsl.gr/fm_util/rank" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="fm_util">
+		<wsdl:port binding="tns:fm_utilSOAP" name="fm_utilSOAP">
+			<soap:address location="http://services.tsl.gr:8080/fm_util/services/fm_util/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

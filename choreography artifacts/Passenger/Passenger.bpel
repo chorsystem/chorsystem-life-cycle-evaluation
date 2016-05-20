@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes"
+    id="0c8c6445-93e7-40ba-9a30-8e3395055602" name="Passenger"
+    targetNamespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ent="http://iaas.uni-stuttgart.de/allowEnsembles/EntityManagement"
+    xmlns:ns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+    xmlns:ns0="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+    xmlns:ns1="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+    xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+    xmlns:ode="http://www.apache.org/ode/type/extension"
+    xmlns:prefs="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+    xmlns:pssg="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+    xmlns:route="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+    xmlns:tripAlternative="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+    xmlns:ums="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+    xmlns:utility_process="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="PassengerArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="UrbanMobilityArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="UtilityCalculationArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/"
+        location="PolicyTripAlternativeProcessorArtifacts.wsdl" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"/>
+    <bpel:import importType="http://www.w3.org/2001/XMLSchema"
+        location="UrbanMobility.xsd" namespace="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"/>
+    <bpel:partnerLinks>
+        <bpel:partnerLink
+            name="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl"
+            partnerLinkType="ns:Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-plt" partnerRole="UrbanMobilityProvider"/>
+        <bpel:partnerLink
+            name="Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-pl"
+            partnerLinkType="ns0:Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-plt" partnerRole="UtilityCalculationProvider"/>
+        <bpel:partnerLink
+            name="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl"
+            partnerLinkType="ns1:Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-plt" partnerRole="PolicyTripAlternativeProcessorProvider"/>
+        <bpel:partnerLink myRole="PassengerProvider"
+            name="User-Passenger-realizedBy-PassengerPT-pl" partnerLinkType="ns2:User-Passenger-realizedBy-PassengerPT-plt"/>
+    </bpel:partnerLinks>
+    <bpel:variables>
+        <bpel:variable messageType="ns:tripRequestMessage" name="tripRequestMessage-InputVariable"/>
+        <bpel:variable messageType="ns:receiveTripRequestResponse" name="receiveTripRequestResponse-OutputVariable"/>
+        <bpel:variable
+            messageType="ns0:UtilityCalculationRequestMessage" name="UtilityCalculationRequestMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns0:UtilityCalculationResponseMessage" name="UtilityCalculationResponseMessage-OutputVariable"/>
+        <bpel:variable messageType="ns:positiveTripDecisionMessage" name="positiveTripDecisionMessage-InputVariable"/>
+        <bpel:variable messageType="ns:paymentDetailsMessage" name="paymentDetailsMessage-InputVariable"/>
+        <bpel:variable messageType="ns:negativeTripDecisionMessage" name="negativeTripDecisionMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns1:policyTripAlternativeProcessorRequestMessage" name="policyTripAlternativeProcessorRequestMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns1:policyTripAlternativeProcessorResponseMessage" name="policyTripAlternativeProcessorResponseMessage-OutputVariable"/>
+        <bpel:variable messageType="ns2:passengerTripRequestMessage" name="passengerTripRequestMessage-InputVariable"/>
+        <bpel:variable
+            messageType="ns2:passengerTripRequestResponseMessage" name="passengerTripRequestResponseMessage-OutputVariable"/>
+        <bpel:variable messageType="ns2:receiveTripAlternativesMessage" name="receiveTripAlternativesMessage-InputVariable"/>
+        <bpel:variable messageType="ns2:requestPaymentRequest" name="requestPaymentRequest-InputVariable"/>
+        <bpel:variable messageType="ns2:paymentStatusMessage" name="paymentStatusMessage-InputVariable"/>
+        <bpel:variable name="ensembleID" type="xsd:string"/>
+        <bpel:variable name="customerID" type="xsd:string"/>
+        <bpel:variable name="isTripAlternative" type="xsd:boolean">
+            <bpel:from><![CDATA[false()]]></bpel:from>
+        </bpel:variable>
+        <bpel:variable name="userFrontendToken" type="xsd:string"/>
+        <bpel:variable name="transactionStatus" type="xsd:string"/>
+        <bpel:variable name="startClusterRegion" type="xsd:int"/>
+        <bpel:variable name="endClusterRegion" type="xsd:int"/>
+        <bpel:variable name="passengerPolicy" type="xsd:string"/>
+        <bpel:variable element="ns2:tripAlternative" name="passengerTripAlternativeSelection"/>
+        <bpel:variable element="tripAlternative:tripAlternative" name="tripAlternative"/>
+    </bpel:variables>
+    <bpel:correlationSets>
+        <bpel:correlationSet name="PassengerCS" properties="ns2:PassengerCSProperty"/>
+        <bpel:correlationSet name="EnsembleIDCS" properties="ns2:EnsembleIDCS"/>
+    </bpel:correlationSets>
+    <bpel:messageExchanges>
+        <bpel:messageExchange name="TripRequestME"/>
+        <bpel:messageExchange name="AlternativeME"/>
+    </bpel:messageExchanges>
+    <bpel:sequence id="183c40c3-0051-41d1-a666-decc5f0b95f4" name="main">
+        <bpel:receive createInstance="yes"
+            id="15116c29-16b8-4f7a-8699-a7e907dbcd17"
+            messageExchange="TripRequestME" name="receiveTripRequest"
+            operation="passengerTripRequest"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+            portType="ns2:PassengerPT" variable="passengerTripRequestMessage-InputVariable">
+            <bpel:correlations>
+                <bpel:correlation initiate="yes" set="PassengerCS"/>
+            </bpel:correlations>
+        </bpel:receive>
+        <bpel:assign name="assignParameters" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:tripRequest
+                            xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:passengerID>tns:passengerID</tns:passengerID>
+                            <tns:ensembleID>tns:ensembleID</tns:ensembleID>
+                            <tns:userFrontendToken>tns:userFrontendToken</tns:userFrontendToken>
+                            <tns:startingPoint>
+                                <tns1:latitude>0.0</tns1:latitude>
+                                <tns1:longitude>0.0</tns1:longitude>
+                            </tns:startingPoint>
+                            <tns:destinationPoint>
+                                <tns1:latitude>0.0</tns1:latitude>
+                                <tns1:longitude>0.0</tns1:longitude>
+                            </tns:destinationPoint>
+                            <tns:userPreferences/>
+                            <tns:departTime>12:00:00</tns:departTime>
+                            <tns:arrivalTime>12:00:00</tns:arrivalTime>
+                            <tns:transportationMode>tns:transportationMode</tns:transportationMode>
+                            <tns:startClusterRegion>0</tns:startClusterRegion>
+                            <tns:endClusterRegion>0</tns:endClusterRegion>
+                        </tns:tripRequest>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[prefs:passengerID]]></bpel:query>
+                </bpel:from>
+                <bpel:to variable="customerID"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>123</bpel:literal>
+                </bpel:from>
+                <bpel:to variable="ensembleID"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from variable="customerID"/>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:passengerID]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from variable="ensembleID"/>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:ensembleID]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:userFrontendToken]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:userFrontendToken]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:start_loc]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:startingPoint]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:end_loc]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:destinationPoint]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:departTime]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:departTime]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:arrivalTime]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:arrivalTime]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:transportationModes[1]]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:transportationMode[1]]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:startClusterRegion]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:startClusterRegion]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>1</bpel:literal>
+                </bpel:from>
+                <bpel:to variable="userFrontendToken"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[prefs:userFrontendToken]]></bpel:query>
+                </bpel:from>
+                <bpel:to variable="userFrontendToken"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:forEach counterName="CounterPreferencesUMS"
+            name="ForEachUserPreference" parallel="no">
+            <bpel:startCounterValue><![CDATA[1]]></bpel:startCounterValue>
+            <bpel:finalCounterValue><![CDATA[count($passengerTripRequestMessage-InputVariable.payload/pssg:userPreferences/pssg:preferencesList)]]></bpel:finalCounterValue>
+            <bpel:scope>
+                <bpel:assign name="assignUserPreferenceToUMS" validate="no">
+                    <bpel:copy>
+                        <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[ode:insert-as-last-into($tripRequestMessage-InputVariable.payload/ns:userPreferences,$passengerTripRequestMessage-InputVariable.payload/pssg:userPreferences/pssg:preferencesList[position()=$CounterPreferencesUMS])]]></bpel:from>
+                        <bpel:to><![CDATA[$tripRequestMessage-InputVariable.payload/ns:userPreferences]]></bpel:to>
+                    </bpel:copy>
+                </bpel:assign>
+            </bpel:scope>
+        </bpel:forEach>
+        <bpel:invoke id="bd7871b2-2ece-4d21-99db-3a4f3704deda"
+            inputVariable="tripRequestMessage-InputVariable"
+            name="askTripAlternatives" operation="receiveTripRequest"
+            outputVariable="receiveTripRequestResponse-OutputVariable"
+            partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl" portType="ns:UrbanMobilityPT">
+            <bpel:correlations>
+                <bpel:correlation initiate="no" pattern="response" set="EnsembleIDCS"/>
+            </bpel:correlations>
+        </bpel:invoke>
+        <bpel:assign name="assignUMSTripAlternatives" validate="no">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:UtilityPassengerCalculationRequest
+                            xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                            xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UtilityCalculationProcess"
+                            xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+                            xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                            xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <tns:passengerID>tns:passengerID</tns:passengerID>
+                            <tns:ensembleID>tns:ensembleID</tns:ensembleID>
+                            <tns:startLocation>
+                                <tns1:latitude>0.0</tns1:latitude>
+                                <tns1:longitude>0.0</tns1:longitude>
+                            </tns:startLocation>
+                            <tns:endLocation>
+                                <tns1:latitude>0.0</tns1:latitude>
+                                <tns1:longitude>0.0</tns1:longitude>
+                            </tns:endLocation>
+                            <tns:departTime>12:00:00</tns:departTime>
+                            <tns:arrivalTime>12:00:00</tns:arrivalTime>
+                            <tns:tripAlternatives/>
+                            <tns:userPreferences/>
+                            <tns:transportationMode>tns:transportationMode</tns:transportationMode>
+                            <tns:startCluster>0</tns:startCluster>
+                            <tns:endCluster>0</tns:endCluster>
+                        </tns:UtilityPassengerCalculationRequest>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable"/>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from variable="customerID"/>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:passengerID]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from variable="ensembleID"/>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:ensembleID]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:startingPoint]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:startLocation]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:destinationPoint]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:endLocation]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:departTime]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:departTime]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:arrivalTime]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:arrivalTime]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="tripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:transportationMode[1]]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:transportationMode[1]]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:startClusterRegion]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:startCluster]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[pssg:endClusterRegion]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="UtilityCalculationRequestMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:endCluster]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:sequence name="Sequence8">
+            <bpel:forEach counterName="CounterUserPreferences"
+                name="ForEachUserPreference2" parallel="no">
+                <bpel:startCounterValue><![CDATA[1]]></bpel:startCounterValue>
+                <bpel:finalCounterValue><![CDATA[count($passengerTripRequestMessage-InputVariable.payload/pssg:userPreferences/pssg:preferencesList)]]></bpel:finalCounterValue>
+                <bpel:scope name="scopePreferenceToUtilityMessage">
+                    <bpel:assign
+                        name="assignUserPreferenceToUtilityMessage" validate="no">
+                        <bpel:copy>
+                            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[ode:insert-as-last-into($UtilityCalculationRequestMessage-InputVariable.payload/utility_process:userPreferences,$passengerTripRequestMessage-InputVariable.payload/pssg:userPreferences/pssg:preferencesList[position()=$CounterUserPreferences])]]></bpel:from>
+                            <bpel:to><![CDATA[$UtilityCalculationRequestMessage-InputVariable.payload/utility_process:userPreferences]]></bpel:to>
+                        </bpel:copy>
+                    </bpel:assign>
+                </bpel:scope>
+            </bpel:forEach>
+        </bpel:sequence>
+        <bpel:sequence name="Sequence9">
+            <bpel:forEach counterName="TripAlternativeUMSCounter"
+                name="ForEachTripAlternativeUMS" parallel="no">
+                <bpel:startCounterValue><![CDATA[1]]></bpel:startCounterValue>
+                <bpel:finalCounterValue><![CDATA[count($receiveTripRequestResponse-OutputVariable.payload/ns:tripAlternatives/ums:tripAlternative)]]></bpel:finalCounterValue>
+                <bpel:scope name="scopeTripAlternativetoUtilityMessage">
+                    <bpel:assign name="assignTripAlternativeUMS" validate="no">
+                        <bpel:copy>
+                            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[ode:insert-as-last-into($UtilityCalculationRequestMessage-InputVariable.payload/utility_process:tripAlternatives,$receiveTripRequestResponse-OutputVariable.payload/ns:tripAlternatives/ums:tripAlternative[position()=$TripAlternativeUMSCounter])]]></bpel:from>
+                            <bpel:to><![CDATA[$UtilityCalculationRequestMessage-InputVariable.payload/utility_process:tripAlternatives]]></bpel:to>
+                        </bpel:copy>
+                    </bpel:assign>
+                </bpel:scope>
+            </bpel:forEach>
+        </bpel:sequence>
+        <bpel:invoke id="425834c1-4b19-4182-934c-3b5d5de390ea"
+            inputVariable="UtilityCalculationRequestMessage-InputVariable"
+            name="calculateUtility"
+            operation="utilityPassengerCalculation"
+            outputVariable="UtilityCalculationResponseMessage-OutputVariable"
+            partnerLink="Passenger-UtilityCalculation-realizedBy-UtilityCalculationPT-pl" portType="ns0:UtilityCalculationPT"/>
+        <bpel:if id="01acab99-6fe1-43db-8115-8adc045789bf" name="IfPassengerPolicyExists">
+            <bpel:condition><![CDATA[$passengerTripRequestMessage-InputVariable.payload/pssg:policyType = "utility" or $passengerTripRequestMessage-InputVariable.payload/pssg:policyType = "duration" or $passengerTripRequestMessage-InputVariable.payload/pssg:policyType = "price"]]></bpel:condition>
+            <bpel:sequence id="0099e3d0-f3d3-4a92-a7e1-18d1815438ab" name="sequencePolicyExists">
+                <bpel:assign name="assignProcessPolicyRequest" validate="no">
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+
+                                <tns:policyTripAlternativeProcessorRequest
+                                    xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/policyProcessor/tripAlternative"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns:policyType>tns:policyType</tns:policyType>
+                                    <tns:tripAlternatives/>
+                                </tns:policyTripAlternativeProcessorRequest>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="policyTripAlternativeProcessorRequestMessage-InputVariable"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <tns1:tripAlternative
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns1:routeID>tns1:routeID</tns1:routeID>
+                                    <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routeTotalTime>tns2:routeTotalTime</tns2:routeTotalTime>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                    </tns1:route>
+                                    <tns1:utility>0.0</tns1:utility>
+                                </tns1:tripAlternative>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to variable="tripAlternative"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="passengerTripRequestMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[prefs:policyType]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="policyTripAlternativeProcessorRequestMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:policyType]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                </bpel:assign>
+                <bpel:forEach counterName="CounterTAUtility"
+                    name="ForEachTripAlternativeUtility" parallel="no">
+                    <bpel:startCounterValue><![CDATA[1]]></bpel:startCounterValue>
+                    <bpel:finalCounterValue><![CDATA[count($receiveTripRequestResponse-OutputVariable.payload/ns:tripAlternatives/ums:tripAlternative)]]></bpel:finalCounterValue>
+                    <bpel:scope name="scopeTripAlternativesUtility">
+                        <bpel:assign
+                            name="assignTripAlternativesUtility" validate="no">
+                            <bpel:copy>
+                                <bpel:from>
+                                    <bpel:literal>
+                                    <tns1:tripAlternative
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns1:routeID>tns1:routeID</tns1:routeID>
+                                    <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routeTotalTime>tns2:routeTotalTime</tns2:routeTotalTime>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                    </tns1:route>
+                                    <tns1:utility>0.0</tns1:utility>
+                                    </tns1:tripAlternative>
+                                    </bpel:literal>
+                                </bpel:from>
+                                <bpel:to variable="tripAlternative"/>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:routeID]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:routeID]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeID]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeID]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeTotalCost]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeTotalCost]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeTotalDistance]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeTotalDistance]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeTotalTime]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeTotalTime]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routePolyline]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routePolyline[1]]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeTotalNumberofChanges]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeTotalNumberofChanges]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeTotalWalkingDistance]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeTotalWalkingDistance]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:route/route:routeSteps]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:route/route:routeSteps]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from><![CDATA[$UtilityCalculationResponseMessage-OutputVariable.payload/utility_process:tripAlternatives/ums:tripAlternative[position()=$CounterTAUtility]/ums:utility]]></bpel:from>
+                                <bpel:to variable="tripAlternative">
+                                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ums:utility]]></bpel:query>
+                                </bpel:to>
+                            </bpel:copy>
+                            <bpel:copy>
+                                <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[ode:insert-as-last-into($policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns1:tripAlternatives,$tripAlternative)]]></bpel:from>
+                                <bpel:to><![CDATA[$policyTripAlternativeProcessorRequestMessage-InputVariable.payload/ns1:tripAlternatives]]></bpel:to>
+                            </bpel:copy>
+                        </bpel:assign>
+                    </bpel:scope>
+                </bpel:forEach>
+                <bpel:invoke id="95eb9391-d886-4813-a332-577b519b5a6f"
+                    inputVariable="policyTripAlternativeProcessorRequestMessage-InputVariable"
+                    name="invokePolicyProcessor" operation="process"
+                    outputVariable="policyTripAlternativeProcessorResponseMessage-OutputVariable"
+                    partnerLink="Passenger-PolicyTripAlternativeProcessor-realizedBy-PolicyProcessorPT-pl" portType="ns1:PolicyProcessorPT"/>
+                <bpel:assign name="assignRouteSelection" validate="no">
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <ns2:passengerTripResponse
+                                    xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <ns2:passengerID>ns2:passengerID</ns2:passengerID>
+                                    <ns2:ensembleID>ns2:ensembleID</ns2:ensembleID>
+                                    <ns2:tripAlternatives>
+                                    <tns1:tripAlternative>
+                                    <tns1:routeID>tns1:routeID</tns1:routeID>
+                                    <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps/>
+                                    </tns1:route>
+                                    <tns1:utility>0.0</tns1:utility>
+                                    </tns1:tripAlternative>
+                                    </ns2:tripAlternatives>
+                                </ns2:passengerTripResponse>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="customerID"/>
+                        <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:passengerID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="ensembleID"/>
+                        <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:ensembleID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:tripAlternative]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:tripAlternatives/ums:tripAlternative[1]]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from><![CDATA[true()]]></bpel:from>
+                        <bpel:to variable="isTripAlternative"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <tns1:tripAlternative
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns1:routeID>tns1:routeID</tns1:routeID>
+                                    <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges
+										</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance
+										</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode
+												</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                    </tns1:route>
+                                    <tns1:utility>0.0</tns1:utility>
+                                </tns1:tripAlternative>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to variable="passengerTripAlternativeSelection"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="policyTripAlternativeProcessorResponseMessage-OutputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns1:tripAlternative]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to variable="passengerTripAlternativeSelection"/>
+                    </bpel:copy>
+                </bpel:assign>
+                <bpel:reply id="3cb19a60-bd43-47a1-bc41-c2892a782397"
+                    messageExchange="TripRequestME" name="replyOutput"
+                    operation="passengerTripRequest"
+                    partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+                    portType="ns2:PassengerPT" variable="passengerTripRequestResponseMessage-OutputVariable"/>
+            </bpel:sequence>
+            <bpel:else id="f719e38d-f983-48ea-bdfb-ff9b79f19a2a">
+                <bpel:sequence id="eed7d6cf-d511-4647-a49c-a472add0bcbc" name="sequencePassengerManualChoice">
+                    <bpel:assign name="assignUtilityToResponse" validate="no">
+                        <bpel:copy>
+                            <bpel:from>
+                                <bpel:literal>
+                                    <ns2:passengerTripResponse
+                                    xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PassengerProcess"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/Route"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <ns2:passengerID>ns2:passengerID</ns2:passengerID>
+                                    <ns2:ensembleID>ns2:ensembleID</ns2:ensembleID>
+                                    <ns2:tripAlternatives>
+                                    <tns1:tripAlternative>
+                                    <tns1:routeID>tns1:routeID</tns1:routeID>
+                                    <tns1:route>
+                                    <tns2:routeID>
+                                    <tns2:startCluster>0</tns2:startCluster>
+                                    <tns2:endCluster>0</tns2:endCluster>
+                                    <tns2:routeID>tns2:routeID</tns2:routeID>
+                                    </tns2:routeID>
+                                    <tns2:routeTotalCost>0.0</tns2:routeTotalCost>
+                                    <tns2:routeTotalDistance>0.0</tns2:routeTotalDistance>
+                                    <tns2:routeTotalTime>tns2:routeTotalTime
+													</tns2:routeTotalTime>
+                                    <tns2:routePolyline>tns2:routePolyline</tns2:routePolyline>
+                                    <tns2:routeTotalNumberofChanges>tns2:routeTotalNumberofChanges
+													</tns2:routeTotalNumberofChanges>
+                                    <tns2:routeTotalWalkingDistance>tns2:routeTotalWalkingDistance
+													</tns2:routeTotalWalkingDistance>
+                                    <tns2:routeSteps>
+                                    <tns2:routeStep>
+                                    <tns2:startLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:startLocation>
+                                    <tns2:endLocation>
+                                    <tns3:latitude>0.0</tns3:latitude>
+                                    <tns3:longitude>0.0</tns3:longitude>
+                                    </tns2:endLocation>
+                                    <tns2:stepDuration>0.0</tns2:stepDuration>
+                                    <tns2:transportationMode>tns2:transportationMode
+															</tns2:transportationMode>
+                                    <tns2:stepDistance>0.0</tns2:stepDistance>
+                                    <tns2:startRegion>0</tns2:startRegion>
+                                    <tns2:endRegion>0</tns2:endRegion>
+                                    </tns2:routeStep>
+                                    </tns2:routeSteps>
+                                    </tns1:route>
+                                    <tns1:utility>0.0</tns1:utility>
+                                    </tns1:tripAlternative>
+                                    </ns2:tripAlternatives>
+                                    </ns2:passengerTripResponse>
+                                </bpel:literal>
+                            </bpel:from>
+                            <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable"/>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from variable="customerID"/>
+                            <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:passengerID]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from variable="ensembleID"/>
+                            <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:ensembleID]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from part="payload" variable="UtilityCalculationResponseMessage-OutputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[utility_process:tripAlternatives]]></bpel:query>
+                            </bpel:from>
+                            <bpel:to part="payload" variable="passengerTripRequestResponseMessage-OutputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:tripAlternatives]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                    </bpel:assign>
+                    <bpel:reply
+                        id="e4e27c93-e8b8-4ffd-a38d-66ba655343db"
+                        messageExchange="TripRequestME"
+                        name="replyOutput"
+                        operation="passengerTripRequest"
+                        partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+                        portType="ns2:PassengerPT" variable="passengerTripRequestResponseMessage-OutputVariable"/>
+                </bpel:sequence>
+            </bpel:else>
+        </bpel:if>
+        <bpel:receive id="df58e013-007b-45d5-9a50-d9926e68c1c8"
+            messageExchange="AlternativeME"
+            name="receivePassengeralternative"
+            operation="receiveTripAlternatives"
+            partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+            portType="ns2:PassengerPT" variable="receiveTripAlternativesMessage-InputVariable">
+            <bpel:correlations>
+                <bpel:correlation initiate="no" set="PassengerCS"/>
+            </bpel:correlations>
+        </bpel:receive>
+        <bpel:assign name="assignExistsSelectedRoute" validate="no">
+            <bpel:copy>
+                <bpel:from part="payload" variable="receiveTripAlternativesMessage-InputVariable">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:existTripAlternative]]></bpel:query>
+                </bpel:from>
+                <bpel:to variable="isTripAlternative"/>
+            </bpel:copy>
+        </bpel:assign>
+        <bpel:if id="85c912fb-0b68-4cbf-895a-c75eff372fee" name="ifExistsTripAlternative">
+            <bpel:condition><![CDATA[boolean($isTripAlternative) = true()]]></bpel:condition>
+            <bpel:sequence id="289bd25b-da2e-4b10-a434-9e2d085d3bf3" name="existsTripAlternative">
+                <bpel:receive id="7ad04680-0948-4731-9b90-4fff2b0c490c"
+                    name="receivePaymentRequest"
+                    operation="requestPayment"
+                    partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+                    portType="ns2:PassengerPT" variable="requestPaymentRequest-InputVariable">
+                    <bpel:correlations>
+                        <bpel:correlation initiate="no" set="PassengerCS"/>
+                    </bpel:correlations>
+                </bpel:receive>
+                <bpel:assign name="assignPositiveTripDecision" validate="no">
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <tns:receivePassengerPositiveTripRequest
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns:passengerID>tns:passengerID</tns:passengerID>
+                                    <tns:userFrontendToken>tns:userFrontendToken
+									</tns:userFrontendToken>
+                                    <tns:ensembleID>tns:ensembleID</tns:ensembleID>
+                                    <wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing"/>
+                                    <tns:routeID>
+                                    <tns3:startCluster>0</tns3:startCluster>
+                                    <tns3:endCluster>0</tns3:endCluster>
+                                    <tns3:routeID>tns3:routeID</tns3:routeID>
+                                    </tns:routeID>
+                                    <tns:paymentInfo>
+                                    <tns:routeID>
+                                    <tns3:startCluster>0</tns3:startCluster>
+                                    <tns3:endCluster>0</tns3:endCluster>
+                                    <tns3:routeID>tns3:routeID</tns3:routeID>
+                                    </tns:routeID>
+                                    <tns:paymentMethod>tns:paymentMethod</tns:paymentMethod>
+                                    <tns:paymentMethodName>tns:paymentMethodName
+										</tns:paymentMethodName>
+                                    <tns:paymentMethodNumber>tns:paymentMethodNumber
+										</tns:paymentMethodNumber>
+                                    <tns:paymentAmount>tns:paymentAmount
+										</tns:paymentAmount>
+                                    </tns:paymentInfo>
+                                </tns:receivePassengerPositiveTripRequest>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="customerID"/>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:passengerID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="ensembleID"/>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:ensembleID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:userFrontendTokenID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:userFrontendToken]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:startCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:startCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:endCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:endCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:routeID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:routeID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:startCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:routeID/route:startCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:endCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:routeID/route:endCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:routeID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:routeID/route:routeID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:paymentMethod]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:paymentMethod]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:paymentMethodName]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:paymentMethodName]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:paymentMethodNumber]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:paymentMethodNumber]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:paymentAmount]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:paymentInfo/ns:paymentAmount]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="receiveTripAlternativesMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[wsa:EndpointReference]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="positiveTripDecisionMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[wsa:EndpointReference]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                </bpel:assign>
+                <bpel:invoke id="c45c7cd6-2742-4e96-a52f-f78ec0ec57c1"
+                    inputVariable="positiveTripDecisionMessage-InputVariable"
+                    name="sendPositiveTripDecision"
+                    operation="receivePositiveTripDecision"
+                    partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl" portType="ns:UrbanMobilityPT"/>
+                <bpel:receive id="554e65d8-6b20-4421-bd19-16f153423c14"
+                    name="receivePaymentStatus"
+                    operation="receiveTransactionStatus"
+                    partnerLink="User-Passenger-realizedBy-PassengerPT-pl"
+                    portType="ns2:PassengerPT" variable="paymentStatusMessage-InputVariable">
+                    <bpel:correlations>
+                        <bpel:correlation initiate="no" set="PassengerCS"/>
+                    </bpel:correlations>
+                </bpel:receive>
+                <bpel:assign name="assignPaymentStatusMessage" validate="no">
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <tns:paymentConfirmation
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns:passengerID>tns:passengerID</tns:passengerID>
+                                    <tns:userFrontendToken>tns:userFrontendToken
+									</tns:userFrontendToken>
+                                    <tns:ensembleID>tns:ensembleID</tns:ensembleID>
+                                    <tns:transactionID>tns:transactionID</tns:transactionID>
+                                    <tns:status>tns:status</tns:status>
+                                    <tns:routeID>
+                                    <tns3:startCluster>0</tns3:startCluster>
+                                    <tns3:endCluster>0</tns3:endCluster>
+                                    <tns3:routeID>tns3:routeID</tns3:routeID>
+                                    </tns:routeID>
+                                </tns:paymentConfirmation>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable"/>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="paymentStatusMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:passengerID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:passengerID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="userFrontendToken"/>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:userFrontendToken]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="paymentStatusMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:ensembleID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:ensembleID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="paymentStatusMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:transactionID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:transactionID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="paymentStatusMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:status]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:status]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:startCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:startCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:endCluster]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:endCluster]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from part="payload" variable="requestPaymentRequest-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns2:paymentData/ns2:routeID/route:routeID]]></bpel:query>
+                        </bpel:from>
+                        <bpel:to part="payload" variable="paymentDetailsMessage-InputVariable">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:routeID/route:routeID]]></bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                </bpel:assign>
+                <bpel:invoke id="1a1c7418-cafd-4a9a-a6e7-c10eb6c02173"
+                    inputVariable="paymentDetailsMessage-InputVariable"
+                    name="sendPaymentStatus"
+                    operation="receivePaymentConfirmation"
+                    partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl" portType="ns:UrbanMobilityPT"/>
+            </bpel:sequence>
+            <bpel:else id="5c4af8d7-d78e-48a5-a9f2-3404ad79385f">
+                <bpel:sequence id="28a3445d-0843-4bce-b246-9653d889b04b" name="noTripAlternativeSelected">
+                    <bpel:assign name="assignNegativeTripDecisoin" validate="no">
+                        <bpel:copy>
+                            <bpel:from>
+                                <bpel:literal>
+
+                                    <tns:receivePassengerNegativeTripRequest
+                                    xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess"
+                                    xmlns:tns1="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/Passenger"
+                                    xmlns:tns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobility"
+                                    xmlns:tns3="http://iaas.uni-stuttgart.de/allowEnsembles/Route" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <tns:passengerID>tns:passengerID</tns:passengerID>
+                                    <tns:ensembleID>tns:ensembleID</tns:ensembleID>
+                                    </tns:receivePassengerNegativeTripRequest>
+                                </bpel:literal>
+                            </bpel:from>
+                            <bpel:to part="payload" variable="negativeTripDecisionMessage-InputVariable"/>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from variable="customerID"/>
+                            <bpel:to part="payload" variable="negativeTripDecisionMessage-InputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:passengerID]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from variable="ensembleID"/>
+                            <bpel:to part="payload" variable="negativeTripDecisionMessage-InputVariable">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[ns:ensembleID]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                    </bpel:assign>
+                    <bpel:invoke
+                        id="fade70d8-63d9-4c14-810c-f134d99ec37c"
+                        inputVariable="negativeTripDecisionMessage-InputVariable"
+                        name="sendNegativeTripDecision"
+                        operation="receiveNegativeTripDecision"
+                        partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl" portType="ns:UrbanMobilityPT"/>
+                </bpel:sequence>
+            </bpel:else>
+        </bpel:if>
+    </bpel:sequence>
+</bpel:process>

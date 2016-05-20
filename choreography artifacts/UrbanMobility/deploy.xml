@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:PaymentProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/PaymentProcess" xmlns:TransportationMeanDiscovery="http://iaas.uni-stuttgart.de/allowEnsembles/TransportationMeanDiscovery" xmlns:UrbanMobilityProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UrbanMobilityProcess" xmlns:UserProcess="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" xmlns:tm="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/TransportationMean">
+  <process name="UrbanMobilityProcess:UrbanMobility">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Passenger-UrbanMobility-realizedBy-UrbanMobilityPT-pl">
+      <service name="UrbanMobilityProcess:UrbanMobility-UrbanMobilityPT-Service" port="UrbanMobility-UrbanMobilityPT-Port"/>
+    </provide>
+    <invoke partnerLink="UrbanMobility-Payment-realizedBy-PaymentPT-pl">
+      <service name="PaymentProcess:Payment-PaymentPT-Service" port="Payment-PaymentPT-Port"/>
+    </invoke>
+    <invoke partnerLink="UrbanMobility-TransportationMeanDiscovery-realizedBy-TransportationMeanDiscoveryPT-pl">
+      <service name="TransportationMeanDiscovery:TransportationMeanDiscovery-TransportationMeanDiscoveryPT-Service" port="TransportationMeanDiscovery-TransportationMeanDiscoveryPT-Port"/>
+    </invoke>
+    <invoke partnerLink="UrbanMobility-User-realizedBy-UserPT-pl">
+      <service name="UserProcess:User-UserPT-Service" port="User-UserPT-Port"/>
+    </invoke>
+     <invoke partnerLink="UrbanMobility-TransportationMean-realizedBy-TransportationMeanPT-pl">
+      <service name="tm:TransportationMean-TransportationMeanPT-Service" port="TransportationMean-TransportationMeanPT-Port"/>
+    </invoke>
+  </process>
+</deploy>
