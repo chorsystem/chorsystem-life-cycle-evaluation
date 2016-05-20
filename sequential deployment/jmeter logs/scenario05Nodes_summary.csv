@@ -1,3 +1,4 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,bytes,grpThreads,allThreads,Latency
 1461700366223,1842,Deploy UtilityCalculation process model,200,OK,Test Scenario 1-1,text,true,758,1,1,1842
 1461700368067,680,Deploy User process model,200,OK,Test Scenario 1-1,text,true,716,1,1,680
 1461700368749,348,Deploy TransportationMean process model,200,OK,Test Scenario 1-1,text,true,751,1,1,348
