@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ChorStartMessage xmlns="http://www.example.org/choreography_control_message">
+    <choreographyModelId>bbb50ea0-ce1b-4e09-8cb6-86e44a079824</choreographyModelId>
+    <instanceWaitingTime>200</instanceWaitingTime>
+    <startParticipants>
+        <name xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">ns2:User</name>
+        <headerMetaData>&lt;metaData xmlns="http://simtech.uni-stuttgart.de" xmlns:simTech="http://simtech.uni-stuttgart.de"&gt;&lt;mdProperty xmlns:NS1="http://simtech.uni-stuttgart.de" NS1:name="creationTime" NS1:value="1460390186566"/&gt;&lt;/metaData&gt;</headerMetaData>
+        <payload>&lt;tns:User-client-UserPortType-Request xmlns:tns="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;tns:input&gt;tns:input&lt;/tns:input&gt;
+&lt;/tns:User-client-UserPortType-Request&gt;
+</payload>
+        <endpoint>
+            <method>process</method>
+            <portType xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">ns2:client-UserPortType</portType>
+            <port xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">ns2:User-client-UserPortType-Port</port>
+            <service xmlns:ns2="http://iaas.uni-stuttgart.de/allowEnsembles/chor/TripBooking/UserProcess">ns2:User-client-UserPortType-Service</service>
+        </endpoint>
+    </startParticipants>
+</ChorStartMessage>
