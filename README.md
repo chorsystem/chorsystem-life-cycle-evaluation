@@ -1,4 +1,4 @@
-## Performance evaluation of ChorSystem Middleware life cycle operations
+## Performance evaluation of the ChorSystem Middleware life cycle operations
 
 This repository contains the workflow models implementing the trip booking choreography model used for evaluating the life cycle operations provided by the ChorSystem Middleware. Futhermore, it contains the measured raw data as well as the aggregated results. For each scenario, we conducted 10 runs.
 
